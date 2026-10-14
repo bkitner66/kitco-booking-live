@@ -1,0 +1,1446 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="robots" content="noindex, nofollow">
+<title>Book an Appointment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Figtree:wght@400&display=swap" rel="stylesheet">
+<style>
+  /* Serif: ITC Bodoni Seventy-Two (the face Apple ships as "Bodoni 72").
+     iPhone/iPad/Mac use the built-in Bodoni 72; Windows uses the installed ITC Bodoni Seventy-Two Pro
+     (by family name: Chrome's local() can't see per-user fonts); everything else gets Prata. */
+  @font-face {
+    font-family: "Bodoni72";
+    src: local("BodoniSvtyTwoITCTT-Book"), local("Bodoni 72 Book");
+    font-weight: 400;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Bodoni72";
+    src: local("BodoniSvtyTwoITCTT-Bold"), local("Bodoni 72 Bold");
+    font-weight: 700;
+    font-display: swap;
+  }
+  /* Devices without Bodoni 72 (e.g. Android) get Prata, scaled to take the same width. */
+  @font-face {
+    font-family: "PrataFit";
+    src: url("https://fonts.gstatic.com/s/prata/v22/6xKhdSpbNNCT-sWPCm4.woff2") format("woff2");
+    size-adjust: 79%;
+    font-display: swap;
+  }
+
+  :root {
+    --serif: "Bodoni72", "Bodoni 72", "Bodoni Svntytwo ITC Pro Book", "PrataFit", Georgia, serif;
+    --sans: "Lato", system-ui, -apple-system, sans-serif;
+    --ink: #0e1a45;
+    --text: #13235a;
+    --muted: #4c62a4;
+    --step: #2c4a8c;
+    --teal: #167a96;
+    --blue: #1380a8;
+    --blue-deep: #0a7bab;
+    --line: #d4e7ee;
+    --track: #d7dce5;
+    --header: #2c3748;
+    --error: #c0392b;
+    --status-h: 53px;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: #eef0f3; color: var(--text); font-family: var(--sans);
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+
+  .serif {
+    font-family: var(--serif); font-weight: 400; color: var(--ink);
+    font-variant-numeric: lining-nums; letter-spacing: -.01em;
+  }
+
+  /* ---------- Device frame (desktop preview) ---------- */
+  .stage { min-height: 100%; display: flex; align-items: center; justify-content: center; padding: 32px 16px; }
+  .device {
+    position: relative; width: 417px; height: 936px; padding: 12px; flex: none;
+    border-radius: 68px; background: #0b0b0c;
+    box-shadow: 0 0 0 2px #3a3a3c, 0 0 0 4px #121213, 0 40px 80px rgba(15, 24, 64, .18);
+  }
+  .screen { position: relative; width: 100%; height: 100%; border-radius: 56px; overflow: hidden; background: #fff; }
+  .island {
+    position: absolute; top: 11px; left: 50%; transform: translateX(-50%); z-index: 3;
+    width: 124px; height: 34px; border-radius: 20px; background: #000;
+  }
+  .statusbar {
+    position: absolute; inset: 0 0 auto; height: var(--status-h); z-index: 2; background: #fff;
+    display: flex; align-items: center; justify-content: space-between; padding: 2px 26px 0 41px;
+    font: 600 16.5px/1 -apple-system, "SF Pro Text", "Segoe UI", system-ui, sans-serif; color: #000;
+  }
+  .statusbar .icons { display: flex; align-items: center; gap: 6px; }
+  .scroller {
+    position: absolute; inset: var(--status-h) 0 0; overflow-y: auto; overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+  .scroller::-webkit-scrollbar { display: none; }
+
+  /* Screenshot mode (?shot): the bare 393pt screen with status bar, no bezel */
+  .shot body { background: #fff; }
+  .shot .stage { padding: 0; display: block; }
+  .shot .device { width: 393px; height: 100vh; padding: 0; border-radius: 0; box-shadow: none; background: #fff; }
+  .shot .screen { border-radius: 0; }
+
+  /* Real phones: full screen, the OS draws its own status bar */
+  /* ---------- Phones (up to 599px): full screen ---------- */
+  @media (max-width: 599px) {
+    html:not(.shot) body { background: #fff; }
+    html:not(.shot) .stage { padding: 0; display: block; }
+    html:not(.shot) .device { width: 100%; height: 100dvh; padding: 0; border-radius: 0; background: #fff; box-shadow: none; }
+    html:not(.shot) .screen { border-radius: 0; }
+    html:not(.shot) .island, html:not(.shot) .statusbar { display: none; }
+    html:not(.shot) .scroller { inset: 0; }
+    html:not(.shot) .app { padding-top: env(safe-area-inset-top); }
+    html:not(.shot) .app.has-topbar { padding-top: 0; }
+    html:not(.shot) .topbar { padding-top: env(safe-area-inset-top); height: calc(53px + env(safe-area-inset-top)); }
+    /* the Kitco bar only shows on step 1 on phones */
+    html:not(.shot) .app:not(.has-topbar) .topbar { display: none; }
+  }
+
+  /* ---------- Site banner: Kitco bar + photo with title and EN/FR (tablet & desktop only) ---------- */
+  .site-head { display: none; position: relative; }
+  @media (min-width: 600px) {
+    html:not(.shot) .topbar { display: none; }
+    html:not(.shot) .site-head { display: block; }
+    html:not(.shot) main.s1 .page-title { display: none; }
+    html:not(.shot) main.s1 .step-label { margin-top: 0; }
+    /* steps 2-4: only the thin Kitco bar, so the booking card can be larger; EN/FR moves into the bar */
+    html:not(.shot) .app:not(.has-topbar) .hero { display: none; }
+    html:not(.shot) .app:not(.has-topbar) .lang {
+      top: calc((clamp(38px, 2.9cqw, 68px) - clamp(32px, 2.55cqw, 53px) * .8) / 2);
+      transform: scale(.8); transform-origin: right top;
+    }
+  }
+  .app { container-type: inline-size; }
+  .site-bar { background: #1f2f3e; height: clamp(38px, 2.9cqw, 68px); display: flex; align-items: center; padding-left: clamp(18px, 1.76cqw, 38px); }
+  .site-logo { display: flex; align-items: flex-end; width: clamp(140px, 12.7cqw, 280px); }
+  .site-logo svg { height: auto; display: block; }
+  .site-logo .ic-mark { width: 31.8%; }
+  .site-logo .kw { width: 58.3%; margin-left: 3.5%; }
+  .site-logo .reg { width: 5.7%; margin-left: .6%; align-self: flex-start; }
+  .hero {
+    position: relative; min-height: clamp(150px, 14.1cqw, 302px); padding: clamp(20px, 2.2cqw, 48px) 24px clamp(18px, 2cqw, 44px);
+    background: #2c3846 url("assets/counter.jpg") center / cover no-repeat; color: #fff; text-align: center;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .hero-title { text-wrap: balance; color: #fff !important; font-size: clamp(28px, 4cqw, 84px); line-height: 1.12; margin: 0; letter-spacing: 0 !important; text-shadow: 0 1px 12px rgba(0, 0, 0, .25); }
+  .hero-sub { text-wrap: balance; font: 400 clamp(16px, 2.56cqw, 54px)/1.3 "Figtree", var(--sans); margin: .45em 0 0; color: #f4f6f8; text-shadow: 0 1px 10px rgba(0, 0, 0, .25); }
+  .lang {
+    position: absolute; top: calc(clamp(38px, 2.9cqw, 68px) + clamp(10px, 1.2cqw, 26px)); right: clamp(14px, 2.44cqw, 55px); display: flex; z-index: 1;
+    background: #f4f6f7; border-radius: clamp(6px, .45cqw, 9px); padding: 2px; box-shadow: 0 2px 10px rgba(0, 0, 0, .18);
+  }
+  .lang button {
+    border: 0; background: none; cursor: pointer; font: 700 clamp(13px, 1.1cqw, 22px)/1 var(--sans); color: #1b8db1;
+    width: clamp(44px, 3.55cqw, 78px); height: clamp(32px, 2.55cqw, 53px); border-radius: clamp(5px, .38cqw, 7px);
+    transition: background-color .2s ease, color .2s ease, box-shadow .2s ease;
+  }
+  .lang button.active { background: #fff; color: #2b3644; box-shadow: 0 0 0 1px #dfe4e8, 0 1px 3px rgba(0, 0, 0, .12); }
+  .lang button:not(.active):hover { color: #0d6f8f; }
+
+  /* Phones: compact banner on step 1 only, EN/FR in the bar */
+  @media (max-width: 599px) {
+    html:not(.shot) .topbar { display: none; }
+    html:not(.shot) .app.has-topbar .site-head { display: block; }
+    html:not(.shot) main.s1 .page-title { display: none; }
+    html:not(.shot) main.s1 .step-label { margin-top: 10px; }
+    /* step 1: tighter spacing so the text can grow into the freed space (see fill()) */
+    html:not(.shot) .hero { padding: 10px 16px 11px; }
+    /* one shorter title that includes the address, no subtitle */
+    html:not(.shot) .hero-sub, html:not(.shot) .hero-title .for-desk { display: none; }
+    html:not(.shot) .hero-title { font-size: 20px; line-height: 1.18; }
+    html:not(.shot) .s1 h2.section { margin: 12px 0 6px; }
+    html:not(.shot) .s1 h2.section.second { margin: 8px 0 6px; }
+    html:not(.shot) .s1 .card { margin-bottom: 6px; }
+    html:not(.shot) .s1 .card.intent { height: 64px; }
+    html:not(.shot) .s1 .card .ic-cart { top: 16px; }
+    html:not(.shot) .s1 .card .ic-box { top: 13.5px; }
+    html:not(.shot) .s1 .card.duration { padding: 5px 0 6px; }
+    html:not(.shot) .s1 .card .desc { font-size: 14px; line-height: 16.5px; }
+    html:not(.shot) .btn.s1 { margin-top: 8px; }
+    html:not(.shot) main.s1 { padding-bottom: calc(env(safe-area-inset-bottom) + 10px); }
+    .site-bar { height: calc(53px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) 0 0 17px; }
+    .site-logo { width: 122px; }
+    .hero { min-height: 0; padding: 18px 18px 20px; }
+    .hero-title { font-size: 23px; line-height: 1.15; }
+    .hero-sub { font-size: 14px; margin-top: 6px; }
+    .lang { top: calc(env(safe-area-inset-top) + 11.5px); right: 12px; padding: 2px; border-radius: 7px; }
+    .lang button { width: 38px; height: 26px; font-size: 12px; border-radius: 5px; }
+  }
+
+  /* transaction value and Kitco account question share a row */
+  /* label / control / error rows are shared (subgrid) so the box and the Yes/No line up even when a label wraps */
+  .field.pair-row { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto; column-gap: 14px; }
+  .field.pair-row > .field { margin-top: 0; min-width: 0; display: grid; grid-row: span 3; grid-template-rows: subgrid; }
+  .pair-row .label { align-self: end; }
+  .pair-row .radios { margin-top: 0; height: 33px; align-items: center; }
+  .pair-row .radios label { width: auto; margin-right: 22px; }
+
+  /* Phones: steps 1 and 3 grow (via --k) to use the free space down to the button */
+  @media (max-width: 599px) {
+    html:not(.shot) main.s1 .cols, html:not(.shot) main.s3 .cols { display: flex; flex-direction: column; zoom: var(--k, 1); }
+  }
+
+  /* ---------- Kitco site menu (same contents as the online.kitco.com hamburger) ---------- */
+  .site-menu { background: none; border: 0; padding: 6px; margin: 0 clamp(10px, 1.1cqw, 22px) 0 -6px; display: flex; cursor: pointer; }
+  .site-menu svg { width: clamp(22px, 1.76cqw, 38px); height: auto; }
+  .kmenu { position: fixed; inset: 0; z-index: 50; visibility: hidden; font-family: Arial, Helvetica, sans-serif; }
+  .kmenu.open { visibility: visible; }
+  .km-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, .5); opacity: 0; transition: opacity .25s ease; }
+  .kmenu.open .km-backdrop { opacity: 1; }
+  .km-panel {
+    position: absolute; inset: 0 auto 0 0; width: min(400px, 100vw); background: #fff; display: flex; flex-direction: column;
+    transform: translateX(-100%); transition: transform .25s ease; box-shadow: 0 0 24px rgba(0, 0, 0, .2);
+  }
+  .kmenu.open .km-panel { transform: none; }
+  .km-head { background: #293343; color: #fff; font-size: 14px; padding: calc(16px + env(safe-area-inset-top)) 16px 16px 20px; display: flex; align-items: center; gap: 12px; flex: none; }
+  .km-head > div { flex: 1; }
+  .km-head a { color: #ebbc4e; text-decoration: none; }
+  .km-close { background: none; border: 0; color: #fff; width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .km-pages { position: relative; flex: 1; overflow: hidden; }
+  .km-page { position: absolute; inset: 0; overflow-y: auto; padding: 8px 20px 32px; transition: transform .25s ease; background: #fff; }
+  .km-sub { transform: translateX(100%); padding-top: 0; }
+  .kmenu.sub .km-main { transform: translateX(-30%); }
+  .kmenu.sub .km-sub { transform: none; }
+  .km-page a { color: #333; text-decoration: none; }
+  .km-h { display: block; font-weight: 700; font-size: 18px; padding: 8px 0; }
+  .km-page hr { border: 0; border-top: 1px solid #f4f4f7; margin: 4px 0; }
+  .km-page ul { list-style: none; margin: 0 0 6px; padding: 0; }
+  .km-page li > a, .km-page li > button { display: flex; justify-content: space-between; align-items: center; width: 100%; font: 400 16px/1.25 Arial, Helvetica, sans-serif; color: #333; padding: 7px 0; background: none; border: 0; text-align: left; cursor: pointer; }
+  .km-page li > button::after { content: "›"; font-size: 22px; line-height: 1; color: #777; }
+  .km-page a.deal { color: #cf4055; }
+  .km-page a:hover, .km-page li > button:hover { color: #0a7bab; }
+  .km-back { position: sticky; top: 0; background: #f4f4f7; margin: 0 -20px 8px; padding: 12px 20px; }
+  .km-back button { background: none; border: 0; padding: 0; font: 700 16px Arial, Helvetica, sans-serif; color: #333; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+  .km-group { font-weight: 700; font-size: 16px; padding: 10px 0 2px; display: block; }
+
+  .hero-title .for-phone { display: none; }
+  @media (max-width: 599px) { html:not(.shot) .hero-title .for-phone { display: inline; } }
+
+  /* ---------- Live availability states ---------- */
+  .slots-note { font-size: 14px; color: #4f5c86; margin: 4px 0 0; line-height: 1.4; }
+  .slots-note button { background: none; border: 0; padding: 0; color: var(--teal); text-decoration: underline; font: inherit; cursor: pointer; }
+  .loading .day { opacity: .45; }
+  .slots.many { max-height: calc(4 * 36px + 3 * 8px); overflow-y: auto; padding-right: 2px; }
+  .book-error { color: var(--error); font-size: 13px; margin: 8px 0 0; text-align: center; }
+  .btn.busy { opacity: .7; cursor: progress; }
+  .demo-badge {
+    position: fixed; z-index: 40; top: 6px; left: 50%; transform: translateX(-50%);
+    background: #ebbc4e; color: #1f2f3e; font: 700 11px/1 var(--sans); letter-spacing: .02em;
+    padding: 5px 10px; border-radius: 99px; box-shadow: 0 1px 4px rgba(0, 0, 0, .2); pointer-events: none;
+  }
+  .demo-badge[hidden] { display: none; }
+  @media (min-width: 960px) { html:not(.shot) .s2 .slots.many { max-height: calc(4 * 44px + 3 * 8px); } }
+
+  /* layout wrappers only matter on larger screens */
+  .cols, .col, .step-head, .step-left { display: contents; }
+
+  /* ---------- Tablet & desktop (600px and up): a page with the Kitco bar and a centred card ---------- */
+  @media (min-width: 600px) {
+    html:not(.shot) body { background: #eef1f5; }
+    html:not(.shot) .stage { display: block; padding: 0; }
+    html:not(.shot) .device { width: auto; height: 100vh; height: 100dvh; padding: 0; border-radius: 0; background: none; box-shadow: none; }
+    html:not(.shot) .screen { border-radius: 0; background: none; }
+    html:not(.shot) .island, html:not(.shot) .statusbar { display: none; }
+    html:not(.shot) .scroller { inset: 0; }
+    html:not(.shot) .app.has-topbar, html:not(.shot) .app { padding-top: 0; }
+    html:not(.shot) .topbar .bar { width: min(960px, 100% - 48px); margin: 0 auto; }
+    html:not(.shot) .topbar .menu { left: -4px; }
+    html:not(.shot) .topbar .mark { left: 39.4px; }
+    html:not(.shot) .topbar .word { left: 82.5px; }
+    html:not(.shot) .topbar .reg { left: 154.4px; }
+    html:not(.shot) main {
+      flex: none; width: min(560px, 100% - 48px); margin: 32px auto;
+      background: #fff; border-radius: 12px; box-shadow: 0 1px 2px rgba(20, 30, 60, .06), 0 12px 32px rgba(20, 30, 60, .08);
+      padding: 28px 32px 30px;
+    }
+    html:not(.shot) main.s1 .page-title { margin-top: 0; }
+    html:not(.shot) .grow { flex: none; height: 22px; min-height: 0; }
+    html:not(.shot) main.s3 .btn.s3 { margin-top: 6px; }
+    html:not(.shot) .card, html:not(.shot) .slot, html:not(.shot) .day:not(:disabled) { cursor: pointer; }
+    html:not(.shot) .card:hover { border-color: #9fcfe0; }
+    html:not(.shot) .slot:not(:disabled):not(.on):hover { border-color: #7fbfd6; }
+    html:not(.shot) main.s4 { width: min(480px, 100% - 48px); }
+    html:not(.shot) .slots { grid-template-columns: repeat(3, 1fr); column-gap: 8px; }
+    html:not(.shot) .done { padding: 24px 0 8px; }
+  }
+
+  /* ---------- Desktop (960px and up): two columns ---------- */
+  @media (min-width: 960px) {
+    html:not(.shot) main { width: 960px; padding: 34px 48px 34px; margin: 26px auto; zoom: var(--dk, 1); }
+    html:not(.shot) .grow { height: 18px; }
+    html:not(.shot) .page-title { font-size: 36px; line-height: 42px; }
+    html:not(.shot) h1.title { font-size: 34px; line-height: 40px; }
+    html:not(.shot) h2.section { font-size: 24px; line-height: 28px; }
+    html:not(.shot) .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+    html:not(.shot) .col { display: block; min-width: 0; }
+    html:not(.shot) .s1 .cols { margin-top: 24px; }
+    html:not(.shot) .s1 h2.section, html:not(.shot) .s1 h2.section.second { margin: 0 0 12px; }
+    html:not(.shot) .s2 .cols { margin-top: 24px; grid-template-columns: 1.3fr 1fr; }
+    html:not(.shot) .s2 .calendar { padding: 18px 6px 8px; }
+    html:not(.shot) .s2 .cal-head { padding: 0 8px 14px 20px; }
+    html:not(.shot) .s2 .cal-head h3 { font-size: 26px; line-height: 30px; }
+    html:not(.shot) .s2 .dow { font-size: 14px; padding-bottom: 12px; }
+    html:not(.shot) .s2 .day { height: 52px; font-size: 18px; }
+    html:not(.shot) .s2 .day .num { width: 40px; height: 34px; }
+    html:not(.shot) .s2 .day.on .num, html:not(.shot) .s2 .day:not(:disabled):not(.on):hover .num { height: 40px; margin: -3px 0; }
+    html:not(.shot) .s2 .day .dot { width: 5px; height: 5px; }
+    html:not(.shot) .s2 .day.on .dot { margin-top: 7px; }
+    html:not(.shot) .s2 .col h2.section { font-size: 28px; line-height: 32px; margin-bottom: 16px; }
+    html:not(.shot) .s2 .slot { height: 44px; font-size: 16px; }
+    html:not(.shot) .s2 .col h2.section { margin-top: 0; }
+    html:not(.shot) .s3 .cols { margin-top: 22px; align-items: center; }
+    html:not(.shot) .step-head { display: grid; grid-template-columns: auto 1fr; column-gap: 54px; align-items: start; }
+    html:not(.shot) .step-left { display: block; }
+    html:not(.shot) .step-head h1.title { margin: 0; align-self: start; font-size: 38px; line-height: 44px; }
+    html:not(.shot) .s3 .summary { margin-top: 0; }
+    html:not(.shot) main.s3 .btn.s3 { margin-top: 10px; }
+    html:not(.shot) .btn.s1, html:not(.shot) .btn.s2 { width: 260px; align-self: flex-end; }
+    html:not(.shot) main.s4 { width: min(520px, 100% - 48px); }
+  }
+
+  .app { min-height: 100%; display: flex; flex-direction: column; }
+  /* While measuring the natural height, let spacers collapse */
+  .app.measure { min-height: 0; }
+  .app.measure .grow { flex: 0 0 auto; }
+  .alt-serif .serif, .alt-serif .serif * { letter-spacing: -.025em !important; }
+  main { flex: 1; display: flex; flex-direction: column; padding: 0 19px calc(env(safe-area-inset-bottom) + 14px); }
+  .view { animation: fade .25s ease both; }
+  .still .view, .shot .view { animation: none; }
+  @keyframes fade { from { opacity: 0; } }
+
+  /* ---------- Top bar ---------- */
+  .topbar { background: var(--header); height: 53px; flex: none; }
+  .topbar .bar { position: relative; height: 53px; }
+  .topbar .menu { position: absolute; left: 13.1px; top: 14px; background: none; border: 0; padding: 4px; display: flex; }
+  .topbar .mark { position: absolute; left: 56.5px; top: 15.4px; display: flex; }
+  .topbar .word { position: absolute; left: 99.6px; top: 19.3px; display: flex; }
+  .topbar .reg { position: absolute; left: 171.5px; top: 15.1px; }
+
+  /* ---------- Headings & progress ---------- */
+  .page-title { font-size: 28px; line-height: 32px; color: #08091a; margin: 10px 0 0; letter-spacing: -.037em; }
+  .step-label { font-size: 13.6px; line-height: 16px; letter-spacing: .01em; text-transform: uppercase; color: var(--step); margin: 0 0 6px; }
+  .progress { display: flex; gap: 2.5px; width: 237px; }
+  .progress.full { width: 100%; gap: 5px; }
+  .progress i { flex: 1; height: 7px; border-radius: 4px; background: var(--track); }
+  .progress i.on { background: var(--teal); }
+  .progress.full i.on { background: #0b7aa6; }
+
+  .back {
+    display: inline-flex; align-items: center; gap: 10px; align-self: flex-start;
+    background: none; border: 0; padding: 0; color: var(--teal); font-size: 19.5px; line-height: 24px;
+  }
+  .back svg { flex: none; }
+
+  h1.title { font-size: 29px; line-height: 33px; margin: 0; letter-spacing: -.035em; }
+  h2.section { font-size: 21px; line-height: 24px; margin: 0; letter-spacing: -.045em; }
+
+  /* ---------- Step 1 ---------- */
+  .s1 .step-label { margin-top: 10px; }
+  .s1 h2.section { margin: 18px 0 8px; }
+  .s1 .card.duration:last-child { margin-bottom: 0; }
+  .s1 h2.section.second { margin-top: 10px; margin-bottom: 8px; }
+  .card {
+    width: 100%; text-align: left; background: #fff; color: inherit;
+    border: 1px solid var(--line); border-radius: 6px; margin-bottom: 8px;
+    display: grid; transition: border-color .15s, background .15s; padding: 0;
+  }
+  .card.intent { grid-template-columns: 78px 1fr; height: 70px; align-items: center; }
+  .card.duration { grid-template-columns: 60px 1fr; align-items: start; padding: 7px 0 8px; }
+  .card .icon { position: relative; align-self: stretch; }
+  .card .icon svg { position: absolute; }
+  .card .ic-cart { left: 20px; top: 19px; }
+  .card .ic-box { left: 22px; top: 16.5px; }
+  .card .name { display: flex; align-items: center; gap: 12px; font-size: 21px; line-height: 24px; letter-spacing: -.05em; }
+  .card .desc { display: block; font-size: 13.2px; line-height: 16px; font-weight: 300; color: var(--muted); }
+  .card.intent .desc { margin-top: 3px; max-width: 200px; }
+  .card.duration .desc { margin-top: 1px; padding-right: 14px; }
+  .card.intent > span:last-child { padding-top: 1px; }
+
+  .tick {
+    width: 24px; height: 24px; flex: none; border: 2.5px solid var(--teal); border-radius: 5px;
+    display: inline-flex; align-items: center; justify-content: center; background: #fff; transition: background .15s;
+  }
+  .tick svg { opacity: 0; }
+  .card.on .tick { background: var(--teal); }
+  .card.on .tick svg { opacity: 1; }
+
+  .dot-radio {
+    width: 22px; height: 22px; flex: none; border: 2.5px solid #056f8e; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center; margin: 3px 0 0 18px;
+  }
+  .dot-radio::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: #056f8e; transform: scale(0); transition: transform .15s; }
+  .card.on .dot-radio { border-color: #056f8e; }
+  .card.on .dot-radio::after { transform: scale(1); }
+
+  /* ---------- Buttons ---------- */
+  .grow { flex: 1; }
+  .btn {
+    width: 100%; border: 0; background: var(--teal); color: #fff; flex: none;
+    transition: filter .15s, opacity .15s;
+  }
+  .btn:active { filter: brightness(.9); }
+  .btn:disabled { cursor: not-allowed; opacity: .4; }
+  .btn.s1 { height: 42px; border-radius: 5px; font-size: 17px; font-weight: 700; margin-top: 10px; }
+  .btn.s2 { height: 46px; border-radius: 6px; font-size: 18.5px; font-weight: 400; }
+  .btn.s3 { height: 42px; border-radius: 5px; font-size: 16px; font-weight: 400; background: var(--blue); }
+  .btn.s4 { height: 46px; border-radius: 6px; font-size: 18px; font-weight: 300; background: var(--blue-deep); }
+
+  /* ---------- Step 2 ---------- */
+  /* Steps 2 and 3 share the same header block, so Back sits in exactly the same place */
+  .s2 .step-label, .s3 .step-label { margin-top: 0; margin-bottom: 3px; }
+  .s2 .back, .s3 .back { margin-top: 10px; color: #08607c; }
+  .s2 h1.title { margin: 14px 0 12px; }
+  .calendar { border: 1.1px solid #aad8e7; border-radius: 6px; padding: 11px 0 2px; overflow: hidden; }
+  .cal-head { display: flex; align-items: center; padding: 0 5px 9px 16px; }
+  .cal-head h3 { font-size: 20px; line-height: 24px; margin: 0; flex: 1; letter-spacing: -.03em; }
+  .cal-head button { background: none; border: 0; padding: 0; width: 46px; height: 26px; display: flex; align-items: center; justify-content: center; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; padding: 0 2px; }
+  .dow { font-size: 12px; line-height: 14px; color: #4a5e9b; padding-bottom: 8px; }
+  .day {
+    background: none; border: 0; padding: 0; height: 33px; color: #1a2140; font-size: 13.4px;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  }
+  .day .num { width: 31px; height: 21px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .day.on .num { height: 31px; margin: -5px 0 -5px; background: var(--teal); color: #fff; }
+  .day .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--teal); margin-top: 3px; }
+  .day:disabled { cursor: default; }
+  .day:disabled .dot { visibility: hidden; }
+  .day.on .dot { margin-top: 6px; }
+  .day:not(:disabled):not(.on):hover .num { background: #eaf5f8; height: 31px; margin: -5px 0; }
+  .s2 h2.section { margin: 16px 0 10px; }
+    .slots { display: grid; grid-template-columns: 116px 112px 112px; justify-content: space-between; row-gap: 8px; }
+  .slot { height: 36px; border: 1.1px solid #b3dcea; border-radius: 5px; background: #fff; font-size: 14px; color: #1a2140; padding: 0; white-space: nowrap; }
+  .slot.on { background: var(--teal); border-color: var(--teal); color: #fff; }
+  .slot:disabled { color: #b6bccb; cursor: default; }
+  .s2 .grow { min-height: 14px; }
+
+  /* ---------- Step 3 ---------- */
+  .s3 h1.title { margin: 8px 0 10px; }
+  .field + .field { margin-top: 9px; }
+  .field.gap { margin-top: 11px; }
+  .label { display: block; font-size: 12px; line-height: 14px; color: #0f1a3d; margin: 0 0 4px; }
+  label[for="notes"] { margin-bottom: 4px; }
+  .box {
+    display: flex; align-items: center; height: 36px; border: 1.2px solid #a6d6e6; border-radius: 5px; background: #fff;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .box:focus-within { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(21, 122, 149, .12); }
+  .box input, .box textarea { border: 0; outline: 0; background-color: transparent; min-width: 0; }
+  .box input { width: 100%; height: 100%; padding: 0 13px; font-size: 13.1px; color: var(--text); }
+  .box .lead { width: 46px; flex: none; display: flex; }
+  .box .lead .ic-user { margin-left: 11px; }
+  .box .lead .ic-mail { margin-left: 10px; }
+  .box .lead + input { padding-left: 0; }
+  .box.short { height: 34px; }
+  .box.shorter { height: 33px; }
+  .box .plus { flex: none; padding-left: 13px; font-size: 13.5px; color: #0f1a3d; }
+  .box .cc { height: 100%; width: 46px; flex: none; padding: 0 6px 0 1px; font-size: 13.5px; color: #0f1a3d; }
+  .box .vsep { width: 1.2px; height: 21px; background: #b7bfd1; flex: none; }
+  .box .vsep + input { padding-left: 13px; }
+  .box.area { height: auto; align-items: stretch; }
+  .box textarea { width: 100%; height: 83px; padding: 7px 12px; font-size: 13.1px; line-height: 17px; resize: none; color: var(--text); }
+  ::placeholder { color: #5b72aa; opacity: 1; }
+  .box textarea::placeholder { color: #8b9bc4; font-weight: 300; }
+  .err { font-size: 11.5px; color: var(--error); margin-top: 5px; display: none; }
+  .invalid .box { border-color: var(--error); }
+  .invalid .err { display: block; }
+
+  .radios { display: flex; margin-top: 5px; }
+  .radios label { display: flex; align-items: center; gap: 12px; font-size: 13px; color: #0f1a3d; width: 82px; height: 22px; cursor: pointer; }
+  .radios input, .checks input { position: absolute; opacity: 0; pointer-events: none; }
+  .ring { width: 20px; height: 20px; border: 1.6px solid #263a6d; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; }
+  .ring::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--teal); transform: scale(0); transition: transform .2s ease; }
+  .radios input:checked + .ring { border-color: var(--teal); }
+  .radios input:checked + .ring::after { transform: scale(1); }
+  .radios input:focus-visible + .ring, .checks input:focus-visible + .sq { outline: 2px solid var(--teal); outline-offset: 2px; }
+
+  .summary {
+    border: 1.2px solid #a6d2e2; border-radius: 5px; padding: 7px 8px 7px 0; margin: 11px 0 10px;
+    display: grid; grid-template-columns: 76px 1fr;
+  }
+  .summary { position: relative; }
+  .summary .icon > svg { position: absolute; left: 13.5px; top: 16px; }
+  .summary .icon .pair { position: absolute; left: 0; top: 0; bottom: 0; width: 76px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+  .summary .headline { font-size: 17px; line-height: 21px; margin-bottom: 1px; letter-spacing: -.045em; }
+  .summary .sep { margin: 0 8px; }
+  .summary .row { display: flex; align-items: center; gap: 10px; font-size: 12.55px; line-height: 19px; font-weight: 400; color: var(--muted); }
+  .summary .row svg { flex: none; }
+  .summary .row .ic-pin { margin: 0 .7px; }
+  .summary .row .sep { margin: 0 7px; }
+
+  .checks label { display: flex; align-items: center; gap: 12px; font-size: 12.7px; font-weight: 400; color: var(--muted); min-height: 19px; margin-bottom: 7px; cursor: pointer; }
+  .sq { width: 19px; height: 19px; flex: none; border: 1.6px solid #4a5d93; border-radius: 2px; display: flex; align-items: center; justify-content: center; transition: background-color .2s ease, border-color .2s ease; }
+  .sq svg { opacity: 0; transform: scale(.5); transition: opacity .2s ease, transform .2s ease; }
+  .checks input:checked + .sq svg { transform: scale(1); }
+  .checks input:checked + .sq { background: var(--teal); border-color: var(--teal); }
+  .checks input:checked + .sq svg { opacity: 1; }
+  .checks a { color: var(--teal); text-underline-offset: 2px; }
+  .checks .invalid .sq { border-color: var(--error); }
+  .call { display: flex; align-items: center; gap: 14.7px; font-size: 12.4px; font-weight: 400; color: var(--muted); margin: 6px 0 10px; }
+  .call svg { flex: none; margin-left: 1px; }
+  .call a { color: inherit; text-decoration: none; }
+
+  /* ---------- Colours sampled from the mockups ---------- */
+  .serif { color: #000215; }
+  .page-title { color: #000; }
+  .card .desc { color: #4d5674; }
+  .step-label { color: #3f4a68; }
+  .dot-radio { border-color: #056f8e; }
+  .tick { border-color: #056f8e; }
+  .card.on .tick { background: #056f8e; }
+  .progress i.on { background: #0982a2; }
+  .btn.s1 { background: #0e7899; }
+  .btn.s2 { background: #0a7192; }
+  .day { color: #161527; }
+  .day.on .num, .slot.on { background: #087596; border-color: #087596; }
+  .dow { color: #36416a; }
+  .slot { color: #000214; }
+  ::placeholder { color: #5f6d94; }
+  .label { color: #020938; }
+  .radios label { color: #0a0f3d; }
+  .box textarea::placeholder { color: #5f6d94; }
+  .summary .row { color: #000; }
+  .summary .headline { color: #010b3c; }
+  .checks label { color: #000; }
+  .call { color: #000; }
+  .done h1 { color: #001142; }
+  .done p { color: #1c234f; }
+
+  /* ---------- Selection animations (200ms) ----------
+     Screens re-render on each tap, so the element that just changed gets anim-in / anim-out. */
+  .anim-in .tick { animation: tick-in .2s ease; }
+  .anim-in .tick svg { animation: pop-in .2s ease; }
+  .anim-out .tick { animation: tick-out .2s ease; }
+  .anim-in .dot-radio::after { animation: dot-in .2s ease; }
+  .anim-out .dot-radio::after { animation: dot-out .2s ease; }
+  .day.anim-in .num { animation: day-in .2s ease; }
+  .day.anim-out .num { animation: day-out .2s ease; }
+  .slot.anim-in { animation: slot-in .2s ease; }
+  .slot.anim-out { animation: slot-out .2s ease; }
+  .btn.enabling { animation: btn-on .2s ease; }
+  .btn.disabling { animation: btn-off .2s ease; }
+  @keyframes tick-in { from { background-color: #fff; } }
+  @keyframes tick-out { from { background-color: #056f8e; } }
+  @keyframes pop-in { from { transform: scale(.4); opacity: 0; } }
+  @keyframes dot-in { from { transform: scale(0); } }
+  @keyframes dot-out { from { transform: scale(1); } to { transform: scale(0); } }
+  @keyframes day-in { from { background-color: transparent; color: #161527; transform: scale(.6); } }
+  @keyframes day-out { from { background-color: #087596; color: #fff; } }
+  @keyframes slot-in { from { background-color: #fff; border-color: #b3dcea; color: #000214; } }
+  @keyframes slot-out { from { background-color: #087596; border-color: #087596; color: #fff; } }
+  @keyframes btn-on { from { opacity: .4; } }
+  @keyframes btn-off { from { opacity: 1; } }
+  .month-next { animation: month-next .2s ease; }
+  .month-prev { animation: month-prev .2s ease; }
+  @keyframes month-next { from { opacity: 0; transform: translateX(18px); } }
+  @keyframes month-prev { from { opacity: 0; transform: translateX(-18px); } }
+  .invalid .err { animation: err-in .2s ease; }
+  .invalid .box, .invalid .sq { animation: err-border .2s ease; }
+  @keyframes err-in { from { opacity: 0; transform: translateY(-4px); } }
+  @keyframes err-border { from { border-color: #a6d6e6; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+  }
+
+  /* ---------- Step 4 ---------- */
+  .s4 .step-label { margin-top: 5px; }
+  .done { text-align: center; margin: auto 0; padding-bottom: 40px; }
+  .done svg { display: block; margin: 0 auto; }
+  .view .done .ring { animation: pop .35s cubic-bezier(.2, 1.4, .4, 1) both; transform-box: fill-box; transform-origin: center; }
+  .view .done .wipe { animation: wipe 1000ms ease-in-out both; transform-box: fill-box; transform-origin: left; }
+  .shot .done .ring, .shot .done .wipe { animation: none; }
+  @keyframes wipe { from { transform: scaleX(0); } }
+  .done h1 { font-size: 42px; line-height: 46px; font-weight: 700; letter-spacing: -.035em; margin: 20px 0 14px; color: #0d1a4f; }
+  .done p { font-size: 17.5px; line-height: 25px; color: var(--text); margin: 0 0 12px; padding: 0 4px; }
+  .done p:last-of-type { margin-bottom: 26px; }
+  @keyframes pop { from { transform: scale(.5); opacity: 0; } }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="device">
+    <div class="screen">
+      <div class="island"></div>
+      <div class="statusbar">
+        <span>9:41</span>
+        <span class="icons">
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="#000"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="#000"><path d="M8 2.3c2.3 0 4.4.9 6 2.4l1.2-1.3A10.5 10.5 0 0 0 8 .5C5.2.5 2.7 1.6.8 3.4L2 4.7a8.6 8.6 0 0 1 6-2.4zm0 3.4c1.4 0 2.6.5 3.6 1.4l1.2-1.3A7 7 0 0 0 8 3.9a7 7 0 0 0-4.8 1.9l1.2 1.3c1-.9 2.2-1.4 3.6-1.4zm0 3.4c.5 0 1 .2 1.3.5L8 11.5 6.7 9.6c.3-.3.8-.5 1.3-.5z"/></svg>
+          <svg width="27" height="13" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="#000" opacity=".35"/><rect x="2" y="2" width="20" height="9" rx="2.5" fill="#000"/><path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2z" fill="#000" opacity=".4"/></svg>
+        </span>
+      </div>
+      <div class="scroller" id="scroller"><div class="app" id="app"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="kmenu" id="kmenu" role="dialog" aria-modal="true" aria-label="Kitco menu"></div>
+<div class="demo-badge" id="demo-badge" hidden>Demo mode · no real bookings</div>
+
+<script src="config.js"></script>
+<script>
+(() => {
+
+  /* ---------- English / French ---------- */
+  const L = {
+    en: {
+      months: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+      days: ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+      dow: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+      docTitle: "Book an Appointment",
+      heroTitle: "Book an Appointment at our Montreal Counter",
+      heroSub: "We look forward to your visit at 620 Cathcart St., 9th Floor.",
+      heroMobile: "Book an Appointment at 620&nbsp;Cathcart, 9th&nbsp;Floor, Montreal",
+      language: "Language", menu: "Menu",
+      hello: "Hello,", logIn: "Log In", or: "or", createAccount: "Create Account", closeMenu: "Close menu",
+      bookTitle: "Book an Appointment", step: n => `Step ${n} of 4`,
+      whatDo: "What would you like to do?", buy: "Buy", sell: "Sell",
+      buyDesc: "Purchase gold, silver and other precious metals.", sellDesc: "Sell your gold, silver and other precious metals.",
+      howLong: "How much time do you need?", duration: "Duration",
+      d30: "If you know which bullion products you want to buy or sell, or to pick up an order placed online.",
+      d60: "If you’d like help deciding which bullion products to buy, or if you’d like to sell items like old jewelry, scrap, silverware, etc.",
+      d120: "For business appointments that need extra time, or if we’ve asked you to book 2 hours.",
+      minutes: m => `${m} minutes`, hours: h => `${h} hours`,
+      cont: "Continue", back: "Back",
+      chooseDate: "Choose a date &amp; time",
+      loadingTimes: "Loading available times…", loadError: "We couldn’t load the available times.", retry: "Try again",
+      pickDay: "Choose a day with a dot to see its times.", noTimes: "No times are available this month. Try the next month.",
+      booking: "Booking…", bookError: "We couldn’t complete your booking. Please try again, or call 1 866 971-2677.", prevMonth: "Previous month", nextMonth: "Next month", unavailable: " (unavailable)",
+      prepare: "Help us prepare for your visit",
+      namePh: "Enter your name", nameLbl: "Name", emailPh: "Enter email address", emailLbl: "Email address",
+      phone: "Phone number", ccLbl: "Country code",
+      value: "Est. transaction value (CAD)", valueLbl: "Estimated transaction value in Canadian dollars",
+      account: "Do you have a Kitco account?", yes: "Yes", no: "No",
+      notesLbl: "Please provide more details to help us prepare for your visit",
+      notesPh: "List all of the items you’d like to buy or sell and in which quantities, your payment or payout preferences, and your Kitco account number (if applicable).",
+      buyBullion: "Buy Bullion", sellBullion: "Sell Bullion", buySell: "Buy &amp; Sell", mtlTime: "Montréal time",
+      address: "620 Cathcart St, Suite 900, Montréal",
+      terms: 'I accept the SimplyBook.me <a href="https://simplybook.me/en/terms-and-conditions" target="_blank" rel="noopener">terms and conditions</a>',
+      promos: "Send me promotions and helpful information.",
+      call: 'Over $100,000? Call <a href="tel:18669712677">1 866 971-2677</a> before booking.',
+      confirm: "Confirm Booking",
+      success: "Success!", thanks: ["You’re all set! We’ve emailed you a confirmation with everything you need to know for your appointment.", "If you need to change your plans, use the links in the email to reschedule or cancel.", "Thank you! Our team looks forward to welcoming you."],
+      close: "Close",
+      eName: "Please enter your name.", eEmail: "Please enter a valid email address.", eValue: "Please enter an estimated value.",
+      eAccount: "Please choose Yes or No.", eTerms: "Please accept the terms and conditions.",
+    },
+    fr: {
+      months: ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"],
+      days: ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"],
+      dow: ["dim", "lun", "mar", "mer", "jeu", "ven", "sam"],
+      docTitle: "Prendre rendez-vous",
+      heroTitle: "Prenez rendez-vous à notre comptoir de Montréal",
+      heroSub: "Au plaisir de vous accueillir au 620, rue Cathcart, 9e étage.",
+      heroMobile: "Prendre rendez-vous au 620,&nbsp;rue&nbsp;Cathcart, 9e&nbsp;étage, Montréal",
+      language: "Langue", menu: "Menu",
+      hello: "Bonjour,", logIn: "Ouvrir une session", or: "ou", createAccount: "Créer un compte", closeMenu: "Fermer le menu",
+      bookTitle: "Prendre rendez-vous", step: n => `Étape ${n} de 4`,
+      whatDo: "Que souhaitez-vous faire?", buy: "Acheter", sell: "Vendre",
+      buyDesc: "Achetez de l’or, de l’argent et d’autres métaux précieux.", sellDesc: "Vendez votre or, votre argent et vos autres métaux précieux.",
+      howLong: "De combien de temps avez-vous besoin?", duration: "Durée",
+      d30: "Si vous savez quels produits de lingots acheter ou vendre, ou pour récupérer une commande passée en ligne.",
+      d60: "Si vous souhaitez de l’aide pour choisir des produits de lingots, ou si vous voulez vendre de vieux bijoux, des débris de métaux, de l’argenterie, etc.",
+      d120: "Pour les rendez-vous d’affaires qui demandent plus de temps, ou si nous vous avons demandé de réserver 2 heures.",
+      minutes: m => `${m} minutes`, hours: h => `${h} heures`,
+      cont: "Continuer", back: "Retour",
+      chooseDate: "Choisissez une date et une heure",
+      loadingTimes: "Chargement des heures disponibles…", loadError: "Impossible de charger les heures disponibles.", retry: "Réessayer",
+      pickDay: "Choisissez un jour marqué d’un point pour voir les heures.", noTimes: "Aucune heure n’est disponible ce mois-ci. Essayez le mois suivant.",
+      booking: "Réservation…", bookError: "Impossible de terminer la réservation. Veuillez réessayer ou appeler au 1 866 971-2677.", prevMonth: "Mois précédent", nextMonth: "Mois suivant", unavailable: " (non disponible)",
+      prepare: "Aidez-nous à préparer votre visite",
+      namePh: "Entrez votre nom", nameLbl: "Nom", emailPh: "Entrez votre adresse courriel", emailLbl: "Adresse courriel",
+      phone: "Numéro de téléphone", ccLbl: "Indicatif de pays",
+      value: "Valeur estimée ($ CA)", valueLbl: "Valeur estimée de la transaction en dollars canadiens",
+      account: "Avez-vous un compte Kitco?", yes: "Oui", no: "Non",
+      notesLbl: "Donnez-nous plus de détails pour nous aider à préparer votre visite",
+      notesPh: "Indiquez les articles que vous souhaitez acheter ou vendre et leurs quantités, vos préférences de paiement ou de versement, ainsi que votre numéro de compte Kitco (le cas échéant).",
+      buyBullion: "Achat de lingots", sellBullion: "Vente de lingots", buySell: "Achat et vente", mtlTime: "heure de Montréal",
+      address: "620, rue Cathcart, bureau 900, Montréal",
+      terms: 'J’accepte les <a href="https://simplybook.me/fr/terms-and-conditions" target="_blank" rel="noopener">conditions générales</a> de SimplyBook.me',
+      promos: "Envoyez-moi des promotions et des renseignements utiles.",
+      call: 'Plus de 100 000 $? Appelez au <a href="tel:18669712677">1 866 971-2677</a> avant de réserver.',
+      confirm: "Confirmer le rendez-vous",
+      success: "Confirmé!", thanks: ["C’est confirmé! Nous vous avons envoyé par courriel une confirmation avec tout ce qu’il faut savoir pour votre rendez-vous.", "Si vos plans changent, utilisez les liens dans le courriel pour reporter ou annuler votre rendez-vous.", "Merci! Notre équipe a hâte de vous accueillir."],
+      close: "Fermer",
+      eName: "Veuillez entrer votre nom.", eEmail: "Veuillez entrer une adresse courriel valide.", eValue: "Veuillez entrer une valeur estimée.",
+      eAccount: "Veuillez choisir Oui ou Non.", eTerms: "Veuillez accepter les conditions générales.",
+    },
+  };
+  // ?lang=fr link, then the saved choice, otherwise the device language
+  let lang = (() => {
+    const q = new URLSearchParams(location.search).get("lang");
+    if (q === "en" || q === "fr") return q;
+    try { const saved = localStorage.getItem("lang"); if (saved === "en" || saved === "fr") return saved; } catch (e) {}
+    return /^fr\b/i.test(navigator.language || "") ? "fr" : "en";
+  })();
+  const T = () => L[lang];
+
+  // Vector outlines traced from the design mockups: [width, height, colour, path].
+  const TRACED = {
+    menu: [21.9, 15.98, "#ffffff", "M0.00 14.60 L0.00 14.99 L0.13 15.32 L0.59 15.78 L1.05 15.98 L20.58 15.98 L21.24 15.72 L21.70 15.26 L21.83 14.99 L21.83 14.53 L21.70 14.27 L21.24 13.81 L20.98 13.68 L20.39 13.55 L18.02 13.55 L17.95 13.48 L1.32 13.48 L0.85 13.61 L0.20 14.14Z M0.00 7.76 L0.00 8.22 L0.13 8.55 L0.59 9.01 L1.18 9.21 L20.39 9.21 L21.24 8.94 L21.64 8.55 L21.83 8.15 L21.64 7.56 L21.18 7.10 L20.32 6.90 L1.58 6.90 L1.51 6.84 L0.99 6.90 L0.53 7.10 L0.26 7.30Z M0.00 1.05 L0.00 1.45 L0.20 1.91 L0.59 2.30 L1.18 2.56 L19.73 2.56 L20.39 2.63 L21.24 2.37 L21.90 1.58 L21.90 1.12 L21.70 0.79 L21.31 0.39 L20.71 0.07 L2.56 0.07 L2.50 0.00 L1.32 0.00 L0.59 0.26 L0.13 0.72Z"],
+    mark: [38.8, 21.11, "#f6c357", "M0.00 19.01 L0.00 19.53 L0.33 20.12 L0.99 20.85 L1.58 21.11 L3.88 21.11 L3.95 21.04 L6.64 21.04 L6.71 21.11 L15.06 21.04 L15.65 21.11 L16.18 20.85 L16.24 20.19 L15.52 18.48 L15.32 18.28 L14.99 18.15 L10.06 18.15 L10.00 18.22 L4.41 18.15 L4.14 18.22 L3.75 18.08 L3.55 17.82 L3.55 17.49 L4.60 15.19 L4.87 14.40 L5.85 12.36 L6.25 11.97 L6.64 11.84 L11.25 11.90 L11.31 11.84 L14.07 11.84 L14.27 11.77 L14.73 11.90 L15.32 12.63 L15.98 14.34 L16.05 14.73 L17.16 17.16 L18.22 19.93 L18.54 20.45 L19.01 20.91 L19.47 21.11 L19.73 21.04 L23.02 21.04 L23.08 21.11 L36.37 21.04 L36.76 21.11 L37.48 20.98 L37.88 20.65 L38.67 19.40 L38.80 19.01 L38.80 18.54 L38.34 17.23 L36.83 14.01 L36.76 13.68 L36.17 12.36 L35.91 11.97 L35.77 11.51 L34.72 9.54 L34.52 9.34 L34.20 9.21 L31.57 9.27 L31.50 9.21 L29.92 9.21 L29.86 9.14 L25.98 9.14 L25.91 9.08 L25.58 9.14 L23.08 9.08 L22.89 9.14 L22.49 9.60 L22.36 10.06 L21.11 12.82 L21.04 13.15 L20.32 14.47 L20.25 14.86 L20.39 15.26 L21.31 16.44 L21.64 16.77 L21.96 16.84 L22.29 16.64 L22.82 15.78 L23.28 14.60 L24.27 12.56 L24.79 12.03 L25.06 11.90 L32.42 11.84 L32.82 11.97 L33.21 12.36 L33.80 13.88 L35.51 17.43 L35.58 17.89 L35.38 18.08 L34.85 18.22 L22.95 18.22 L22.89 18.15 L21.44 18.22 L20.85 18.02 L20.45 17.62 L19.66 16.11 L19.01 14.66 L18.74 13.68 L18.41 13.09 L18.35 12.76 L16.77 9.67 L16.57 9.47 L15.98 9.27 L15.72 9.34 L13.15 9.27 L12.96 9.21 L12.69 8.94 L12.69 8.48 L15.19 3.35 L15.39 3.16 L15.85 2.96 L23.48 3.09 L23.81 3.22 L24.07 3.49 L24.79 5.26 L25.25 6.05 L25.71 7.43 L26.11 7.96 L26.77 8.15 L28.41 8.15 L28.67 8.09 L28.87 7.76 L26.77 2.89 L26.17 1.32 L25.45 0.26 L24.99 0.07 L19.27 0.00 L19.20 0.07 L14.34 0.07 L13.94 0.20 L13.55 0.59 L11.90 4.01 L11.71 4.67 L10.19 7.69 L10.00 8.29 L9.47 9.08 L9.14 9.21 L5.00 9.14 L4.54 9.34 L3.42 11.51 L3.22 12.17 L2.24 14.20 L2.17 14.53Z"],
+    word: [71.15, 16.9, "#dadee2", "M17.10 0.59 L16.90 0.66 L16.64 1.05 L16.57 8.02 L16.64 8.09 L16.64 14.14 L16.70 14.73 L16.57 15.13 L16.18 15.52 L16.05 15.78 L16.05 16.11 L16.24 16.37 L16.64 16.57 L18.54 16.57 L18.61 16.51 L19.93 16.57 L20.12 16.51 L20.39 16.18 L20.39 15.59 L20.25 14.99 L20.25 10.72 L20.19 10.65 L20.25 0.92 L19.99 0.66 L19.79 0.59 L18.74 0.59 L18.68 0.66Z M22.49 0.53 L22.23 0.72 L22.10 1.05 L22.10 2.70 L22.36 3.03 L22.56 3.09 L22.75 3.03 L26.70 3.03 L26.96 3.16 L27.23 3.55 L27.23 16.18 L27.62 16.57 L28.28 16.51 L28.47 16.57 L30.32 16.57 L30.51 16.37 L30.64 15.98 L30.58 15.52 L30.58 8.48 L30.64 8.42 L30.64 3.95 L30.58 3.62 L30.64 3.35 L30.91 3.09 L31.43 2.96 L36.04 3.03 L36.23 2.89 L36.37 2.56 L36.37 0.79 L36.04 0.53 L32.88 0.53 L32.82 0.59Z M0.26 0.53 L0.00 0.85 L0.13 1.38 L0.13 15.52 L0.07 16.05 L0.20 16.37 L0.46 16.57 L3.22 16.57 L3.55 16.37 L3.68 16.05 L3.62 9.21 L3.88 8.88 L4.21 8.88 L4.73 9.27 L4.87 9.54 L9.67 15.13 L10.92 16.44 L11.25 16.64 L11.90 16.57 L14.80 16.64 L14.99 16.57 L15.13 16.37 L14.99 15.98 L14.20 15.19 L12.43 13.09 L7.96 8.61 L7.76 8.29 L7.89 7.83 L10.98 4.54 L12.89 2.30 L14.14 1.05 L14.20 0.72 L13.88 0.53 L13.55 0.59 L11.25 0.53 L10.65 0.79 L8.22 3.55 L7.50 4.54 L5.52 6.71 L4.80 7.69 L4.21 8.29 L3.88 8.42 L3.62 8.15 L3.55 7.96 L3.62 0.92 L3.22 0.53 L1.05 0.53 L0.99 0.46Z M39.92 1.45 L38.73 2.50 L38.01 3.55 L37.35 5.33 L37.02 7.30 L37.02 9.14 L37.09 9.21 L37.09 10.46 L37.22 11.57 L37.55 12.82 L38.21 14.14 L38.54 14.60 L39.39 15.39 L40.58 16.05 L41.10 16.24 L41.63 16.31 L42.48 16.64 L44.59 16.77 L44.65 16.84 L47.35 16.77 L47.41 16.70 L48.86 16.64 L49.85 16.37 L50.31 16.37 L50.83 16.18 L51.03 15.85 L51.03 15.52 L50.90 15.13 L50.90 14.07 L50.64 13.74 L50.11 13.74 L49.72 13.94 L48.27 14.14 L44.59 14.14 L43.40 13.88 L42.61 13.48 L41.89 12.76 L41.23 11.38 L40.97 10.32 L40.90 8.61 L40.84 8.55 L40.90 6.90 L41.17 5.39 L41.82 4.14 L42.48 3.49 L43.80 2.76 L44.85 2.50 L45.57 2.50 L45.64 2.43 L48.60 2.50 L50.44 2.76 L50.83 2.37 L50.83 1.71 L50.90 1.64 L50.83 0.72 L50.51 0.53 L49.52 0.26 L48.14 0.20 L48.07 0.13 L43.53 0.20 L42.55 0.33 L41.63 0.59Z M54.71 1.58 L54.06 2.24 L53.33 3.29 L52.87 4.47 L52.41 6.64 L52.41 10.26 L52.81 12.49 L53.07 13.22 L53.46 13.94 L54.45 15.06 L55.24 15.59 L56.09 15.98 L57.74 16.37 L58.46 16.64 L60.44 16.90 L62.93 16.90 L65.30 16.64 L67.21 16.18 L68.46 15.59 L69.12 15.13 L69.77 14.47 L70.50 13.28 L71.02 11.44 L71.09 9.80 L71.15 9.73 L71.15 6.90 L70.96 5.33 L70.50 3.75 L69.90 2.70 L69.12 1.84 L67.80 1.05 L66.49 0.59 L65.17 0.26 L62.80 0.00 L59.78 0.07 L57.15 0.46 L56.09 0.79Z M58.86 2.76 L59.91 2.50 L61.03 2.50 L61.09 2.43 L63.72 2.50 L64.45 2.63 L65.50 3.09 L66.42 3.95 L66.81 4.60 L67.21 6.18 L67.27 9.40 L67.14 10.59 L66.81 11.84 L66.35 12.76 L65.63 13.55 L64.51 14.14 L63.92 14.27 L63.26 14.27 L62.61 14.40 L60.30 14.34 L59.32 14.14 L58.13 13.68 L56.95 12.49 L56.42 11.25 L56.23 10.26 L56.16 7.63 L56.29 6.97 L56.29 6.38 L56.49 5.46 L56.95 4.34 L58.00 3.22Z"],
+    cart: [40.71, 37.68, "#010101", "M32.09 29.20 L31.30 29.40 L30.45 29.79 L29.99 30.12 L29.26 30.84 L28.80 31.63 L28.54 32.35 L28.47 34.20 L28.61 34.85 L28.94 35.58 L29.40 36.23 L30.51 37.16 L31.43 37.55 L32.22 37.68 L33.08 37.68 L33.74 37.55 L34.72 37.16 L35.38 36.70 L35.97 36.10 L36.50 35.25 L36.89 34.06 L36.89 32.75 L36.50 31.37 L36.30 31.04 L35.12 29.86 L34.52 29.53 L33.54 29.20Z M13.28 29.20 L12.36 29.53 L11.57 29.99 L10.59 31.11 L10.19 32.03 L10.00 32.75 L10.06 34.46 L10.65 35.77 L11.05 36.30 L11.84 36.96 L12.89 37.48 L14.01 37.68 L15.06 37.62 L15.78 37.42 L16.70 36.89 L17.10 36.56 L17.82 35.71 L18.22 34.92 L18.41 34.13 L18.41 32.82 L18.28 32.03 L17.69 30.84 L16.90 30.05 L16.51 29.79 L15.19 29.26Z M0.46 0.59 L0.07 1.32 L0.00 1.84 L0.26 2.50 L0.85 3.16 L1.45 3.42 L5.92 3.42 L6.18 3.55 L6.58 4.08 L6.84 5.66 L7.17 6.77 L7.43 8.55 L7.69 9.34 L7.89 10.72 L8.22 11.71 L8.42 13.15 L8.68 13.88 L8.88 15.19 L9.47 17.62 L9.54 18.28 L9.80 19.07 L10.13 21.11 L10.39 21.83 L10.65 23.48 L11.11 24.73 L11.51 25.25 L12.43 26.11 L13.61 26.70 L14.34 26.83 L19.01 26.83 L19.07 26.77 L20.71 26.77 L20.78 26.83 L33.28 26.77 L33.34 26.83 L34.46 26.83 L34.85 26.77 L35.77 26.30 L36.70 25.45 L37.02 24.92 L37.16 24.27 L37.35 23.81 L37.68 22.03 L38.01 20.98 L38.21 19.73 L38.47 19.01 L38.73 17.69 L39.00 17.03 L39.26 15.65 L39.65 14.40 L39.79 13.48 L40.11 12.63 L40.38 11.11 L40.58 10.65 L40.71 10.00 L40.58 9.01 L40.18 8.29 L39.59 7.76 L38.87 7.43 L11.25 7.43 L10.85 7.10 L10.65 6.58 L10.39 5.39 L10.26 4.08 L9.93 3.03 L9.86 1.97 L9.73 1.45 L9.27 0.72 L8.55 0.20 L8.15 0.07 L1.32 0.00 L0.85 0.20Z M11.64 11.31 L11.90 11.05 L12.10 10.98 L14.66 10.98 L14.73 11.05 L16.64 11.05 L16.70 10.98 L25.19 10.98 L25.25 11.05 L36.17 10.98 L36.43 11.05 L36.63 11.25 L36.70 11.71 L36.37 12.56 L36.10 14.01 L35.71 15.32 L35.64 15.98 L35.18 17.30 L34.92 18.61 L34.66 19.27 L33.93 22.49 L33.47 23.08 L33.08 23.21 L15.59 23.21 L14.99 23.08 L14.34 22.69 L14.01 22.29 L13.74 21.70 L13.48 19.86 L13.15 18.81 L12.89 17.10 L12.63 16.37 L12.43 14.86 L12.03 13.68 L11.90 12.43 L11.64 11.71Z"],
+    box: [38.54, 43.73, "#000000", "M19.60 0.00 L18.94 0.00 L17.62 0.66 L15.32 2.10 L13.81 2.89 L11.77 4.21 L11.25 4.41 L7.37 6.77 L5.92 7.50 L5.39 7.89 L4.87 8.09 L4.47 8.42 L3.03 9.21 L1.78 10.06 L1.51 10.13 L0.46 10.98 L0.00 12.10 L0.00 32.42 L0.13 32.75 L0.92 33.54 L1.45 33.80 L1.84 34.13 L2.43 34.39 L2.83 34.72 L3.22 34.85 L3.62 35.18 L4.34 35.51 L4.54 35.71 L5.13 35.97 L7.30 37.29 L7.83 37.48 L8.22 37.81 L8.81 38.08 L9.14 38.34 L10.59 39.06 L12.03 39.98 L14.40 41.23 L16.70 42.68 L18.87 43.73 L19.53 43.67 L20.71 43.07 L21.04 42.81 L22.49 42.09 L23.02 41.69 L23.28 41.63 L23.81 41.23 L25.25 40.51 L26.44 39.72 L29.07 38.34 L31.17 37.02 L32.62 36.30 L32.95 36.04 L33.60 35.77 L34.13 35.38 L34.52 35.25 L34.85 34.99 L37.16 33.74 L37.88 33.14 L38.27 32.62 L38.54 31.63 L38.54 12.49 L38.34 11.51 L38.14 11.05 L37.22 10.26 L34.66 8.88 L30.58 6.44 L30.18 6.31 L28.87 5.46 L28.34 5.26 L27.95 4.93 L27.42 4.73 L24.53 2.89 L23.94 2.63 L23.41 2.24 L22.16 1.58 L20.91 0.72Z M34.79 15.45 L34.99 15.65 L34.99 16.31 L34.92 16.37 L34.99 30.32 L34.79 30.84 L33.60 31.63 L32.16 32.29 L30.71 33.21 L30.32 33.34 L28.94 34.26 L26.37 35.58 L26.17 35.77 L24.79 36.50 L24.27 36.89 L22.95 37.55 L21.64 38.47 L21.44 38.54 L21.04 38.47 L20.85 38.14 L20.91 23.54 L21.04 23.28 L21.64 22.75 L25.78 20.45 L26.96 19.66 L27.42 19.47 L28.87 18.54 L29.26 18.41 L30.58 17.56 L32.16 16.77 L32.62 16.44 L33.14 16.24 L34.06 15.59 L34.46 15.39Z M3.68 15.32 L4.21 15.26 L4.87 15.78 L6.12 16.44 L6.51 16.77 L7.96 17.56 L9.01 18.28 L10.39 19.01 L14.53 21.57 L16.84 22.82 L17.30 23.21 L17.43 23.48 L17.43 38.27 L17.23 38.60 L17.10 38.67 L16.77 38.60 L16.31 38.21 L15.45 37.68 L14.80 37.42 L13.42 36.56 L11.84 35.77 L11.64 35.58 L10.26 34.85 L9.54 34.33 L8.35 33.74 L7.96 33.41 L3.88 31.17 L3.55 30.78 L3.55 15.52Z M5.79 12.03 L5.98 11.71 L6.51 11.51 L7.96 10.59 L8.55 10.32 L8.75 10.13 L9.40 9.86 L10.65 9.14 L10.98 9.14 L11.77 9.54 L12.30 9.93 L12.82 10.13 L14.01 10.92 L15.45 11.71 L16.77 12.63 L18.94 13.81 L20.12 14.60 L21.64 15.39 L22.89 16.24 L23.61 16.57 L24.07 16.97 L24.07 17.23 L23.87 17.43 L22.62 18.08 L22.23 18.41 L21.70 18.61 L19.53 19.93 L19.07 19.99 L16.31 18.48 L14.93 17.56 L13.48 16.84 L12.30 16.05 L9.93 14.73 L8.55 13.81 L8.29 13.74 L6.90 12.89 L6.12 12.56 L5.85 12.30Z M14.53 6.90 L14.60 6.71 L14.86 6.44 L15.45 6.18 L17.62 4.87 L18.02 4.73 L18.54 4.34 L19.14 4.08 L19.40 4.08 L19.99 4.34 L20.39 4.67 L22.42 5.79 L22.95 6.18 L24.46 6.90 L27.55 8.88 L29.92 10.13 L30.32 10.46 L30.91 10.72 L31.11 10.92 L31.70 11.18 L32.16 11.51 L32.55 11.64 L32.75 11.84 L32.75 12.17 L32.42 12.49 L31.83 12.76 L30.25 13.74 L29.72 13.94 L28.41 14.80 L28.08 14.93 L27.69 14.93 L25.52 13.68 L24.27 12.82 L22.89 12.10 L21.44 11.18 L20.12 10.52 L19.73 10.19 L19.14 9.93 L17.95 9.14 L14.86 7.37 L14.60 7.10Z"],
+    arrow2: [22.68, 21.69, "#0a6781", "M10.75 0.00 L9.89 0.66 L3.17 7.58 L0.07 10.62 L0.00 11.08 L2.24 13.39 L4.22 15.23 L9.36 20.44 L10.29 21.50 L10.62 21.69 L10.95 21.69 L11.67 21.03 L11.87 20.70 L11.87 20.51 L11.67 20.11 L4.09 12.66 L3.76 12.20 L3.76 11.87 L3.96 11.67 L7.39 11.67 L7.45 11.61 L22.22 11.67 L22.42 11.61 L22.68 11.34 L22.68 10.22 L22.49 9.96 L22.29 9.89 L19.06 9.89 L18.99 9.96 L4.29 9.89 L4.02 9.63 L4.15 9.17 L4.68 8.77 L6.53 6.79 L8.11 5.21 L8.97 4.48 L11.93 1.32 L12.00 0.99 L11.87 0.73 L11.14 0.07Z"],
+    chevL: [8.97, 16.95, "#495682", "M8.57 0.00 L8.24 0.00 L7.98 0.13 L5.54 2.77 L0.20 8.18 L0.00 8.57 L0.13 8.97 L2.04 10.81 L2.70 11.67 L7.91 16.95 L8.37 16.88 L8.64 16.55 L8.57 15.96 L1.91 8.97 L1.78 8.70 L1.78 8.37 L2.84 7.25 L3.89 5.93 L7.85 2.04 L8.18 1.58 L8.90 0.86 L8.97 0.33Z"],
+    chevR: [9.1, 17.21, "#425181", "M0.40 0.00 L0.00 0.40 L0.00 0.73 L0.13 0.99 L4.68 5.60 L6.26 7.45 L7.19 8.37 L7.32 8.70 L7.19 9.10 L0.13 16.22 L0.07 16.35 L0.13 16.88 L0.53 17.14 L0.99 17.21 L1.25 17.08 L2.64 15.69 L3.63 14.57 L5.01 13.25 L7.19 11.01 L7.78 10.29 L8.37 9.76 L9.03 9.03 L9.10 8.57 L1.06 0.13 L0.86 0.00Z"],
+    user: [18.03, 20.37, "#137091", "M5.75 0.78 L5.25 1.14 L4.05 2.41 L3.41 3.83 L3.27 4.40 L3.19 6.46 L3.41 7.60 L3.83 8.52 L3.76 9.02 L3.34 9.44 L2.13 10.22 L0.92 11.57 L0.43 12.57 L0.35 13.06 L0.07 13.84 L0.00 14.48 L0.00 16.97 L0.07 17.53 L0.50 18.60 L0.78 19.03 L1.49 19.74 L2.48 20.23 L3.05 20.37 L15.12 20.37 L16.11 20.09 L16.68 19.74 L17.18 19.24 L17.82 17.96 L18.03 16.97 L17.96 14.27 L17.53 12.71 L17.25 12.14 L16.26 10.79 L15.40 10.01 L13.91 9.09 L13.70 8.80 L13.70 8.45 L14.27 7.38 L14.48 6.32 L14.41 4.47 L13.84 2.98 L13.28 2.06 L12.35 1.14 L11.57 0.64 L10.36 0.14 L9.58 0.00 L8.02 0.00 L7.03 0.21Z M16.40 13.56 L16.61 14.77 L16.54 17.68 L16.26 18.24 L15.83 18.67 L15.12 18.95 L3.48 19.03 L3.05 18.95 L2.41 18.67 L1.70 18.03 L1.49 17.61 L1.42 14.27 L1.63 13.13 L2.20 12.00 L2.77 11.36 L4.26 10.36 L4.61 10.22 L5.04 10.29 L6.39 11.22 L7.88 11.64 L8.45 11.71 L9.51 11.64 L10.72 11.36 L11.22 11.15 L12.42 10.22 L12.71 10.15 L13.06 10.22 L14.84 11.22 L15.76 12.21 L16.11 12.78Z M8.31 1.14 L9.73 1.21 L11.00 1.77 L11.71 2.27 L12.64 3.34 L12.92 3.90 L13.20 5.04 L13.20 6.11 L13.06 6.82 L12.35 8.23 L11.00 9.58 L10.15 10.08 L9.58 10.22 L7.81 10.15 L6.46 9.51 L5.68 8.80 L5.11 8.09 L4.47 6.82 L4.40 6.46 L4.47 4.54 L5.11 3.19 L6.46 1.85 L7.67 1.28Z"],
+    mail: [20.23, 15.4, "#1e3163", "M17.82 2.27 L17.32 2.20 L17.04 2.34 L16.11 3.27 L13.99 5.04 L11.78 7.10 L10.29 8.38 L10.01 8.52 L9.73 8.52 L9.44 8.38 L5.40 4.69 L3.05 2.34 L2.41 2.27 L2.34 2.34 L2.41 2.91 L7.03 7.31 L7.17 7.52 L7.17 7.95 L2.27 12.57 L2.20 13.20 L2.34 13.35 L2.91 13.28 L6.96 9.30 L7.88 8.52 L8.31 8.59 L9.37 9.51 L9.94 9.65 L10.51 9.37 L11.57 8.45 L12.00 8.38 L15.69 11.71 L16.97 13.06 L17.53 13.35 L17.75 13.28 L17.89 13.13 L17.82 12.57 L15.48 10.51 L12.92 8.02 L12.78 7.81 L12.78 7.45 L13.35 6.82 L14.48 5.89 L17.82 2.84 L17.89 2.70Z M0.35 1.21 L0.00 1.92 L0.07 13.63 L0.43 14.34 L1.21 15.05 L2.13 15.40 L9.02 15.40 L9.09 15.33 L9.80 15.40 L14.06 15.40 L14.13 15.33 L18.10 15.40 L18.74 15.19 L19.74 14.41 L20.09 13.77 L20.23 12.85 L20.23 12.07 L20.16 12.00 L20.16 2.06 L19.74 1.14 L19.10 0.57 L18.60 0.28 L17.68 0.07 L15.19 0.07 L15.12 0.00 L3.48 0.07 L3.41 0.00 L2.48 0.00 L1.35 0.28 L0.78 0.71Z M1.21 1.85 L1.77 1.28 L2.48 0.99 L17.96 1.06 L18.32 1.21 L18.95 1.85 L19.10 2.27 L19.10 9.73 L19.03 9.80 L19.03 13.06 L18.88 13.42 L18.24 14.13 L17.46 14.41 L16.04 14.41 L15.97 14.48 L2.91 14.41 L2.27 14.48 L1.85 14.34 L1.14 13.70 L0.99 13.35 L0.99 5.75 L1.06 5.68 L1.06 2.20Z"],
+    cartT: [38.33, 35.21, "#06759e", "M30.45 27.62 L29.46 27.83 L28.82 28.11 L27.83 29.04 L27.33 29.89 L27.12 30.67 L27.12 32.02 L27.33 32.87 L27.69 33.51 L28.75 34.57 L29.89 35.14 L31.38 35.21 L32.80 34.71 L33.51 34.15 L33.93 33.65 L34.57 32.37 L34.64 30.81 L34.50 30.24 L34.00 29.25 L33.44 28.61 L32.51 27.97 L31.52 27.69Z M13.77 27.62 L12.64 27.97 L12.00 28.40 L11.29 29.11 L10.93 29.60 L10.51 30.53 L10.44 31.80 L10.58 32.37 L11.07 33.44 L12.07 34.50 L13.42 35.07 L15.05 35.14 L16.40 34.50 L17.18 33.72 L17.53 33.22 L17.89 32.51 L17.96 32.16 L17.96 30.53 L17.53 29.39 L16.68 28.40 L16.04 27.97 L15.19 27.69 L14.34 27.54Z M0.14 0.99 L0.00 1.42 L0.07 2.41 L0.21 2.70 L1.06 3.41 L2.27 3.55 L5.47 3.48 L5.89 3.55 L6.39 4.05 L6.89 5.54 L6.96 6.18 L7.45 7.95 L7.67 9.37 L7.95 10.08 L8.16 11.50 L9.02 14.62 L9.44 17.25 L9.65 17.82 L9.73 18.60 L10.15 20.09 L10.44 21.65 L10.65 22.29 L11.29 23.50 L12.14 24.35 L13.28 24.92 L14.34 25.06 L24.92 25.06 L24.99 24.99 L31.66 25.06 L32.58 24.92 L33.86 24.35 L34.71 23.57 L35.07 23.07 L35.57 21.79 L35.85 19.88 L36.21 18.81 L36.56 16.90 L36.84 16.11 L37.06 14.70 L37.41 13.63 L37.62 12.35 L37.98 11.50 L37.98 11.22 L38.33 10.08 L38.33 9.44 L37.98 8.52 L37.48 7.95 L36.99 7.60 L36.35 7.38 L35.64 7.31 L31.09 7.31 L31.02 7.38 L10.86 7.31 L10.36 6.89 L10.01 5.82 L10.01 5.54 L9.73 4.69 L9.65 3.90 L9.02 1.63 L8.73 1.21 L8.02 0.57 L6.96 0.07 L6.03 0.07 L5.96 0.00 L1.49 0.07 L0.92 0.28Z M35.00 10.93 L35.00 11.29 L34.71 11.78 L34.50 12.92 L34.15 13.91 L34.00 14.98 L33.65 15.83 L33.37 17.32 L32.94 18.81 L32.87 19.52 L32.44 21.08 L32.23 21.51 L31.66 21.87 L31.38 21.94 L14.77 21.94 L14.13 21.72 L13.70 21.30 L13.56 21.01 L12.71 17.46 L12.71 17.11 L12.42 16.11 L12.14 14.48 L11.93 13.91 L11.36 11.36 L11.36 11.00 L11.71 10.65 L12.00 10.58 L13.70 10.65 L13.77 10.58 L31.09 10.51 L31.16 10.58 L34.15 10.58 L34.64 10.65Z"],
+    cal: [13.49, 13.84, "#2c3f6f", "M0.21 2.13 L0.00 2.70 L0.00 12.14 L0.14 12.71 L0.85 13.49 L1.49 13.77 L11.71 13.84 L12.49 13.63 L13.06 13.13 L13.42 12.42 L13.42 7.31 L13.49 7.24 L13.42 2.56 L13.13 1.85 L12.71 1.42 L12.14 1.14 L10.65 0.99 L10.44 0.78 L10.22 0.14 L10.01 0.00 L9.65 0.00 L9.37 0.21 L9.30 0.85 L9.02 1.14 L4.83 1.21 L4.33 1.06 L4.12 0.78 L4.05 0.21 L3.76 0.00 L3.55 0.00 L3.19 0.28 L3.12 0.78 L2.84 1.06 L1.28 1.21 L0.99 1.35Z M12.49 5.96 L12.57 6.18 L12.57 10.58 L12.49 10.65 L12.57 12.07 L12.42 12.49 L12.21 12.71 L11.64 12.92 L11.36 12.85 L7.60 12.85 L7.52 12.92 L2.70 12.99 L1.56 12.85 L0.99 12.35 L0.85 12.00 L0.85 8.02 L0.92 7.95 L0.92 6.18 L1.21 5.75 L1.35 5.68 L11.78 5.68 L11.93 5.61 L12.21 5.68Z M0.99 2.70 L1.49 2.06 L1.85 1.92 L2.48 1.92 L2.84 2.06 L3.05 2.27 L3.34 3.05 L3.76 3.27 L3.98 3.05 L4.12 2.27 L4.40 1.99 L4.61 1.92 L7.88 1.92 L9.02 2.06 L9.30 2.34 L9.51 2.84 L9.87 2.98 L10.22 2.70 L10.36 2.34 L10.65 2.06 L11.07 1.92 L11.71 1.92 L12.21 2.20 L12.49 2.63 L12.57 4.19 L12.49 4.40 L12.07 4.76 L2.41 4.76 L2.34 4.83 L1.49 4.83 L1.06 4.47 L0.99 4.26Z"],
+    clock: [13.63, 13.49, "#344474", "M6.67 3.19 L6.46 3.55 L6.53 3.98 L6.46 6.18 L6.67 7.31 L7.10 7.52 L8.94 7.60 L9.51 7.45 L9.58 7.03 L9.23 6.82 L7.95 6.89 L7.45 6.46 L7.31 5.54 L7.31 3.41 L7.10 3.19Z M6.39 0.00 L4.83 0.28 L3.34 0.92 L2.41 1.56 L1.35 2.63 L0.64 3.83 L0.21 5.11 L0.00 6.53 L0.07 8.02 L0.28 8.87 L0.92 10.29 L1.85 11.43 L2.56 12.07 L3.12 12.35 L3.34 12.57 L4.97 13.28 L6.18 13.49 L7.60 13.49 L9.23 13.13 L10.51 12.49 L11.15 12.07 L12.00 11.22 L12.71 10.22 L13.28 9.09 L13.56 7.88 L13.63 6.60 L13.35 4.90 L12.99 3.90 L12.28 2.77 L11.07 1.56 L10.22 0.99 L9.09 0.43 L7.67 0.07Z M6.18 0.78 L7.24 0.78 L7.88 0.92 L9.23 1.42 L10.36 2.13 L11.15 2.84 L11.86 3.83 L12.57 5.75 L12.64 7.24 L12.49 8.38 L12.00 9.58 L11.43 10.44 L10.58 11.29 L9.87 11.78 L9.02 12.21 L7.38 12.64 L6.03 12.64 L5.32 12.49 L4.47 12.21 L3.05 11.36 L1.92 10.15 L1.35 9.02 L0.99 7.67 L0.99 6.25 L1.21 5.11 L1.70 3.90 L2.27 3.05 L3.27 2.06 L3.83 1.63 L5.04 1.06Z"],
+    pin: [12.21, 14.41, "#394977", "M6.11 4.05 L5.61 4.19 L4.90 4.76 L4.54 5.47 L4.54 6.03 L4.76 6.46 L5.32 7.03 L5.96 7.31 L6.46 7.31 L7.03 7.03 L7.52 6.53 L7.81 5.89 L7.81 5.61 L7.67 5.18 L7.17 4.54 L6.46 4.12Z M5.96 5.04 L6.46 5.04 L6.82 5.40 L6.82 5.89 L6.39 6.32 L5.96 6.32 L5.68 6.11 L5.54 5.82 L5.61 5.40Z M5.61 0.00 L4.40 0.21 L3.48 0.57 L2.13 1.35 L1.35 2.13 L0.64 3.19 L0.14 4.33 L0.00 5.18 L0.00 6.39 L0.43 7.88 L1.06 9.09 L1.70 10.01 L3.55 12.14 L5.47 14.06 L6.11 14.41 L6.89 14.06 L9.02 11.93 L10.72 9.94 L11.22 9.16 L11.86 7.81 L12.21 6.32 L12.21 5.18 L11.86 3.83 L11.36 2.84 L10.08 1.42 L9.09 0.78 L7.52 0.14Z M5.96 0.92 L7.10 0.99 L8.02 1.21 L9.23 1.85 L10.15 2.70 L10.72 3.48 L11.07 4.19 L11.29 4.97 L11.22 6.89 L10.44 8.66 L9.02 10.44 L7.10 12.49 L6.25 13.28 L5.89 13.28 L3.41 10.72 L2.41 9.51 L1.49 8.09 L1.14 7.24 L0.99 6.39 L0.99 5.25 L1.14 4.40 L1.56 3.48 L2.20 2.63 L3.19 1.77 L4.12 1.28 L5.25 0.99Z"],
+    phone: [14.91, 14.84, "#27396e", "M1.21 0.85 L0.35 1.85 L0.00 2.70 L0.00 3.62 L0.43 5.47 L1.06 6.96 L2.13 8.73 L3.34 10.22 L4.54 11.36 L6.25 12.64 L7.45 13.42 L9.44 14.34 L11.00 14.84 L11.93 14.84 L12.57 14.55 L13.35 13.99 L14.27 13.06 L14.77 12.21 L14.91 11.57 L14.55 10.86 L13.91 10.22 L13.13 9.73 L11.57 8.94 L10.72 8.73 L9.87 9.02 L8.66 10.01 L8.02 9.94 L6.60 8.66 L4.69 6.46 L4.54 6.18 L4.69 5.68 L5.61 4.83 L5.96 4.19 L6.03 3.76 L5.75 3.05 L4.05 0.92 L3.12 0.07 L2.91 0.00 L2.34 0.07Z M2.27 1.14 L2.91 1.06 L3.41 1.56 L4.61 3.19 L4.83 3.62 L4.83 3.98 L4.69 4.26 L3.41 5.54 L3.34 6.18 L4.61 7.95 L6.74 10.15 L7.88 11.00 L8.45 11.15 L9.23 10.79 L10.36 9.87 L11.07 9.80 L12.78 10.72 L13.49 11.22 L13.84 11.64 L13.77 12.21 L12.35 13.49 L11.71 13.77 L11.22 13.77 L10.01 13.28 L8.87 12.99 L7.60 12.35 L5.89 11.22 L5.18 10.58 L3.83 9.09 L2.63 7.45 L1.49 5.32 L0.99 3.69 L0.99 2.70 L1.35 2.06Z"],
+    success: [110.83, 109.77, "#017d43", "M86.80 42.34 L86.59 41.99 L83.27 38.66 L79.73 34.85 L79.38 34.64 L78.88 34.71 L47.29 66.30 L46.79 66.30 L38.31 58.10 L32.73 52.52 L32.30 52.52 L31.95 52.73 L25.16 59.38 L25.09 59.94 L37.11 72.24 L41.92 76.83 L46.79 81.64 L47.29 81.78 L50.75 78.46 L77.12 52.17 L79.03 50.40 L81.29 48.07 L84.12 45.45 L86.73 42.84Z M54.07 0.00 L54.00 0.07 L51.81 0.14 L48.98 0.57 L48.35 0.57 L43.47 1.48 L37.89 3.18 L32.30 5.44 L30.89 6.15 L26.44 8.69 L23.04 10.96 L19.37 13.85 L17.11 15.97 L16.61 16.33 L15.34 17.60 L13.22 19.93 L11.52 21.98 L8.69 26.08 L5.87 30.96 L5.23 32.23 L5.09 32.73 L4.67 33.43 L3.89 35.41 L3.53 36.05 L3.32 36.76 L3.04 37.25 L2.76 38.31 L2.40 39.09 L2.19 40.22 L1.91 40.93 L1.77 41.85 L1.41 42.91 L1.13 44.53 L0.71 46.02 L0.57 47.85 L0.35 48.70 L0.14 50.47 L0.14 51.60 L0.00 52.87 L0.00 57.96 L0.07 58.03 L0.21 60.93 L0.57 63.12 L0.57 63.62 L1.27 67.15 L1.70 68.35 L1.91 69.63 L2.83 72.31 L3.04 73.23 L3.39 73.94 L3.60 74.64 L3.96 75.21 L4.17 75.92 L4.52 76.48 L4.67 77.05 L5.09 77.68 L5.30 78.39 L5.87 79.52 L6.29 80.09 L6.50 80.72 L6.72 80.93 L8.06 83.41 L9.83 86.09 L10.74 87.23 L11.17 87.93 L13.93 91.25 L17.81 95.07 L22.27 98.82 L25.73 101.15 L29.69 103.41 L31.31 104.19 L31.67 104.47 L32.30 104.69 L33.22 105.18 L33.79 105.32 L34.57 105.75 L35.34 105.96 L35.84 106.24 L36.83 106.52 L37.39 106.81 L38.31 107.02 L39.02 107.37 L40.01 107.58 L40.93 107.94 L41.85 108.08 L43.19 108.50 L44.04 108.57 L46.09 109.07 L48.07 109.28 L49.41 109.56 L50.96 109.63 L51.03 109.70 L57.18 109.77 L57.26 109.70 L61.21 109.56 L62.13 109.35 L63.83 109.14 L64.75 109.14 L66.02 108.93 L66.66 108.71 L68.49 108.36 L69.20 108.08 L71.82 107.44 L73.30 106.88 L73.87 106.81 L74.57 106.45 L75.35 106.24 L75.70 106.03 L78.18 105.11 L78.88 104.69 L79.38 104.54 L80.51 103.98 L81.08 103.55 L82.77 102.71 L83.13 102.42 L83.41 102.35 L86.80 100.16 L91.96 96.06 L95.43 92.88 L98.82 89.06 L100.51 86.87 L102.78 83.48 L103.48 82.14 L103.84 81.71 L104.61 80.09 L105.67 78.25 L105.89 77.54 L106.73 75.92 L107.02 75.00 L107.37 74.36 L107.58 73.58 L107.87 73.09 L108.08 72.10 L108.36 71.53 L108.64 70.33 L109.07 69.20 L109.14 68.42 L109.56 67.01 L110.20 63.48 L110.27 62.06 L110.69 59.45 L110.69 58.53 L110.76 58.46 L110.83 50.89 L110.34 47.92 L110.34 47.29 L110.06 45.31 L109.77 44.32 L109.56 42.84 L109.28 41.99 L109.00 40.29 L108.78 39.87 L108.50 38.52 L108.15 37.75 L107.94 36.83 L107.51 35.98 L106.73 33.86 L106.38 33.29 L106.24 32.73 L105.75 31.88 L105.67 31.53 L103.84 27.99 L102.99 26.72 L102.78 26.22 L102.42 25.80 L101.15 23.68 L100.09 22.34 L99.88 21.91 L96.41 17.74 L93.38 14.77 L90.90 12.58 L88.57 10.74 L83.90 7.70 L83.20 7.35 L82.77 7.00 L79.66 5.37 L76.41 4.10 L74.36 3.18 L69.13 1.63 L68.85 1.63 L67.08 1.13 L63.90 0.64 L63.48 0.49 L61.00 0.21 L58.60 0.14 L57.96 0.00Z M51.60 10.96 L53.86 10.89 L53.93 10.81 L56.97 10.81 L57.04 10.89 L60.44 10.96 L63.76 11.38 L68.21 12.44 L70.47 13.15 L70.69 13.29 L71.60 13.50 L74.86 14.84 L76.69 15.76 L77.19 16.12 L78.18 16.54 L80.09 17.67 L83.27 19.93 L86.17 22.34 L87.58 23.68 L90.97 27.28 L93.16 30.25 L94.44 32.23 L96.49 35.98 L98.25 40.01 L98.54 41.07 L98.82 41.63 L99.03 42.62 L99.45 43.90 L99.60 44.81 L100.02 46.02 L100.23 47.71 L100.44 48.42 L100.66 50.47 L100.66 51.88 L100.73 51.95 L100.73 58.32 L100.66 58.39 L100.66 59.52 L100.44 61.50 L99.88 64.61 L99.60 65.38 L99.52 65.95 L98.96 67.50 L98.82 68.28 L98.11 70.33 L96.56 74.01 L94.79 77.12 L92.17 81.01 L90.05 83.69 L86.17 87.65 L83.48 89.91 L79.38 92.81 L77.12 94.01 L76.62 94.36 L75.99 94.58 L74.29 95.50 L73.51 95.71 L72.88 96.06 L71.89 96.34 L71.53 96.56 L70.12 96.98 L69.63 97.26 L68.78 97.48 L68.00 97.83 L67.43 97.90 L65.74 98.39 L62.42 99.03 L61.71 99.03 L58.74 99.38 L52.94 99.38 L52.87 99.31 L51.74 99.31 L50.96 99.17 L48.14 98.96 L46.44 98.54 L44.96 98.32 L44.25 98.04 L42.76 97.76 L42.41 97.55 L39.37 96.63 L38.88 96.34 L38.03 96.06 L37.60 95.78 L36.76 95.50 L32.44 93.30 L29.05 91.04 L27.43 89.77 L24.25 87.01 L21.70 84.47 L18.94 81.08 L16.54 77.40 L14.49 73.65 L13.29 70.90 L12.09 67.22 L12.02 66.66 L11.45 64.61 L10.81 61.21 L10.74 59.87 L10.39 57.47 L10.46 53.23 L10.81 50.40 L10.89 48.84 L11.38 46.72 L11.45 45.87 L11.95 44.18 L12.02 43.54 L13.22 39.94 L13.50 39.44 L14.28 37.46 L15.48 35.06 L15.83 34.57 L16.75 32.80 L18.38 30.32 L20.00 28.13 L23.04 24.74 L24.39 23.40 L26.29 21.70 L29.76 19.01 L31.95 17.53 L35.48 15.62 L37.39 14.84 L38.31 14.35 L42.76 12.72 L45.66 11.95Z"],
+  };
+  const vec = (name, fill, scale = 1) => {
+    const [w, h, c, d] = TRACED[name];
+    return `<svg class="ic-${name}" width="${+(w * scale).toFixed(2)}" height="${+(h * scale).toFixed(2)}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><path fill="${fill || c}" fill-rule="evenodd" d="${d}"/></svg>`;
+  };
+  // silver KITCO lettering; each copy needs its own gradient id
+  const wordmark = (id, cls = "") => {
+    const [w, h, , d] = TRACED.word;
+    return `<svg class="${cls}" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9ecef"/><stop offset="1" stop-color="#c3c8ce"/></linearGradient></defs><path fill="url(#${id})" fill-rule="evenodd" d="${d}"/></svg>`;
+  };
+
+  const icon = {
+    tick: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5L19.5 7"/></svg>`,
+  };
+
+
+  const blank = () => ({
+    step: 1, buy: false, sell: false, duration: null,
+    viewMonth: null, date: null, time: null,
+    form: { name: "", email: "", cc: "+1", phone: "", value: "", account: null, notes: "", terms: false, promos: false },
+    showErrors: false, sending: false, bookError: false,
+  });
+  let state = blank();
+  // ?shot=N renders step N as the bare screen with the mockups' sample booking, for side-by-side checks.
+  const shot = Number(new URLSearchParams(location.search).get("shot")) || 0;
+  const now = () => shot ? new Date(2026, 9, 1, 8) : new Date();
+  const app = document.getElementById("app");
+  const scroller = document.getElementById("scroller");
+
+  /* ---------- helpers ---------- */
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const today = () => { const d = now(); d.setHours(0, 0, 0, 0); return d; };
+  const sameDay = (a, b) => a && b && a.getTime() === b.getTime();
+  const fmtTime = (m, suffix = true) => {
+    const h = Math.floor(m / 60), mm = String(m % 60).padStart(2, "0");
+    if (lang === "fr") return `${h} h ${mm}`;
+    const h12 = ((h + 11) % 12) + 1;
+    return `${h12}:${mm}${suffix ? (h < 12 ? " AM" : " PM") : ""}`;
+  };
+  const fmtRange = (start, len) => {
+    const end = start + len;
+    if (lang === "fr") return `${fmtTime(start)} à ${fmtTime(end)}`;
+    return (start < 720) === (end < 720) ? `${fmtTime(start, false)}–${fmtTime(end)}` : `${fmtTime(start)}–${fmtTime(end)}`;
+  };
+  const fmtDuration = m => m > 60 ? T().hours(m / 60) : T().minutes(m);
+  const fmtLongDate = (d, year = false) => {
+    const t = T();
+    if (lang === "fr") return `${t.days[d.getDay()]} ${d.getDate() === 1 ? "1er" : d.getDate()} ${t.months[d.getMonth()]}${year ? " " + d.getFullYear() : ""}`;
+    return `${t.days[d.getDay()]}, ${t.months[d.getMonth()]} ${d.getDate()}${year ? ", " + d.getFullYear() : ""}`;
+  };
+  const intentLabel = () => state.buy && state.sell ? T().buySell : state.buy ? T().buyBullion : T().sellBullion;
+  // Success ring + check, traced; the check is revealed left to right so it looks drawn.
+  const successIcon = () => {
+    const [w, h, c, d] = TRACED.success, k = .85;
+    const parts = d.split("Z").filter(p => p.trim()).map(p => p.trim() + "Z");
+    const width = p => { const xs = p.match(/-?[\d.]+/g).filter((_, i) => i % 2 === 0).map(Number); return Math.max(...xs) - Math.min(...xs); };
+    const check = parts.filter(p => width(p) < w * .7), ring = parts.filter(p => width(p) >= w * .7);
+    return `<svg class="ic-success" width="${+(w * k).toFixed(2)}" height="${+(h * k).toFixed(2)}" viewBox="0 0 ${w} ${h}" aria-hidden="true">
+      <defs><clipPath id="tick-wipe"><rect class="wipe" width="${w}" height="${h}"/></clipPath></defs>
+      <path class="ring" fill="${c}" fill-rule="evenodd" d="${ring.join(" ")}"/>
+      <path class="check" fill="${c}" d="${check.join(" ")}" clip-path="url(#tick-wipe)"/></svg>`;
+  };
+  const summaryIcon = () => state.buy && state.sell
+    ? `<span class="pair">${vec("cartT", "#000", .7)}${vec("box", "#000", .58)}</span>`
+    : state.buy ? vec("cartT", "#000", .9) : vec("box", "#000", .75);
+  const digits = s => s.replace(/\D/g, "");
+  const fmtPhone = (s, cc) => {
+    const d = digits(s).slice(0, cc === "+1" ? 10 : 14);
+    if (cc !== "+1" || d.length < 4) return d;
+    if (d.length < 7) return `(${d.slice(0, 3)}) ${d.slice(3)}`;
+    return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
+  };
+  const fmtMoney = s => { const d = digits(s).slice(0, 12); return d ? Number(d).toLocaleString("en-CA") : ""; };
+
+  /* ---------- SimplyBook connection ----------
+     Live mode talks to the SimplyBook.me booking API with the key in config.js; without a key the
+     page runs in demo mode on sample availability and never creates a real booking. */
+  const CFG = window.KITCO_BOOKING || {};
+  const DEMO = !CFG.apiKey || shot > 0;
+  const API_URL = "https://user-api.simplybook.me";
+  const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const toMin = hms => { const [h, m] = hms.split(":").map(Number); return h * 60 + m; };
+  const hms = m => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}:00`;
+
+  const live = (() => {
+    let token = null, rpcId = 0;
+    async function rpc(url, method, params, headers = {}) {
+      const r = await fetch(url, {
+        method: "POST", headers: { "Content-Type": "application/json", ...headers },
+        body: JSON.stringify({ jsonrpc: "2.0", method, params, id: ++rpcId }),
+      });
+      const j = await r.json();
+      if (j.error) throw new Error(j.error.message || "SimplyBook error");
+      return j.result;
+    }
+    async function call(method, ...params) {
+      if (!token) token = await rpc(API_URL + "/login", "getToken", [CFG.companyLogin, CFG.apiKey]);
+      return rpc(API_URL, method, params, { "X-Company-Login": CFG.companyLogin, "X-Token": token });
+    }
+    const fieldCache = {};
+    return {
+      // { "2026-10-14": ["14:15:00", ...], ... }
+      startTimes: (from, to, serviceId) => call("getStartTimeMatrix", from, to, serviceId, null, 1),
+      async book(serviceId, date, time, client, answers) {
+        // find this service's intake fields by their wording, so the answers land in the right place
+        const fields = fieldCache[serviceId] || (fieldCache[serviceId] = await call("getAdditionalFields", serviceId));
+        const pick = re => (Array.isArray(fields) ? fields : Object.values(fields || {})).find(f => re.test(f.title || ""))?.name;
+        const additional = {};
+        const put = (re, val) => { const n = pick(re); if (n && val !== "") additional[n] = val; };
+        put(/estimated|estim/i, answers.value);
+        put(/account|compte/i, answers.account);
+        put(/prepare|visit|list|items/i, answers.notes);
+        let unit = null;
+        try {
+          const units = await call("getAvailableUnits", serviceId, `${date} ${time}`, 1);
+          if (Array.isArray(units) && units.length) unit = units[0];
+        } catch (e) { /* let SimplyBook choose */ }
+        return call("book", serviceId, unit, date, time, client, additional, 1);
+      },
+    };
+  })();
+
+  // Demo: weekdays, 15-minute steps from 10:00 to 16:00 (ending by 17:00), with a stable sprinkle of
+  // already-booked times so it looks realistic. Nothing leaves the browser.
+  const demo = {
+    async startTimes(from, to, serviceId) {
+      await new Promise(r => setTimeout(r, shot ? 0 : 350));
+      const dur = { 1: 30, 2: 30, 4: 60, 5: 60, 7: 120, 8: 120 }[serviceId] || 30;
+      const out = {}, d = new Date(from + "T00:00:00"), end = new Date(to + "T00:00:00");
+      const t = now(), nowMin = t.getHours() * 60 + t.getMinutes();
+      for (; d <= end; d.setDate(d.getDate() + 1)) {
+        if (d.getDay() % 6 === 0 || d < today()) continue;
+        const list = [];
+        for (let m = 600; m + dur <= 1020; m += 15) {
+          const seed = (d.getDate() * 31 + m * 7 + serviceId * 13) % 10;
+          if (seed < 3 && !shot) continue;                 // already taken
+          if (sameDay(d, today()) && m <= nowMin + 30) continue;
+          list.push(hms(m));
+        }
+        if (list.length) out[iso(d)] = list;
+      }
+      return out;
+    },
+    async book() {
+      await new Promise(r => setTimeout(r, 700));
+      return { bookings: [{ id: "DEMO-" + Date.now() }] };
+    },
+  };
+  const api = DEMO ? demo : live;
+
+  const serviceId = () => {
+    const kind = state.buy && state.sell ? (CFG.buyAndSell || "buy") : state.buy ? "buy" : "sell";
+    return ((CFG.services || {})[kind] || {})[state.duration];
+  };
+
+  // Availability for the month on screen: cached per service + month
+  const avail = { key: "", days: {}, loading: false, error: false };
+  async function loadMonth(pickFirst = false) {
+    const vm = state.viewMonth, sid = serviceId();
+    const key = sid + ":" + vm.getFullYear() + "-" + vm.getMonth();
+    if (avail.key === key && !avail.error) return;
+    Object.assign(avail, { key, days: {}, loading: true, error: false });
+    render(false);
+    const first = new Date(vm), last = new Date(vm.getFullYear(), vm.getMonth() + 1, 0);
+    const from = first < today() ? today() : first;
+    try {
+      const days = from > last ? {} : await api.startTimes(iso(from), iso(last), sid);
+      if (avail.key !== key) return;                       // the visitor moved on meanwhile
+      avail.days = {};
+      for (const [k, v] of Object.entries(days || {})) if (Array.isArray(v) && v.length) avail.days[k] = v.map(toMin);
+      avail.loading = false;
+      if (pickFirst) {
+        const next = Object.keys(avail.days).sort()[0];
+        if (next) { const [y, mo, d] = next.split("-").map(Number); state.date = new Date(y, mo - 1, d); }
+        else if (pickFirst !== "stop") {                    // nothing left this month: try the next one once
+          state.viewMonth = new Date(vm.getFullYear(), vm.getMonth() + 1, 1);
+          return loadMonth("stop");
+        }
+      }
+    } catch (e) {
+      if (avail.key !== key) return;
+      Object.assign(avail, { loading: false, error: true });
+    }
+    render(false);
+  }
+  const slotsFor = date => (avail.days[iso(date)] || []).map(m => ({ m, disabled: false }));
+  const isBookable = d => !!(avail.days[iso(d)] || []).length;
+
+  /* ---------- shared fragments ---------- */
+  const progress = step => `
+    <div class="step-label">${T().step(step)}</div>
+    <div class="progress ${step === 4 ? "full" : ""}" role="progressbar" aria-valuemin="1" aria-valuemax="4" aria-valuenow="${step}">
+      ${[1, 2, 3, 4].map(i => `<i class="${i <= step ? "on" : ""}"></i>`).join("")}
+    </div>`;
+  const backBtn = name => `<button class="back" data-act="back">${vec(name, "currentColor")}${T().back}</button>`;
+
+  const REG = `<svg class="reg" width="7" height="7" viewBox="0 0 7 7" aria-hidden="true"><circle cx="3.5" cy="3.5" r="3.05" fill="none" stroke="#d3d7dc" stroke-width=".6"/><text x="3.55" y="5.05" text-anchor="middle" font-family="Lato, sans-serif" font-weight="700" font-size="4.3" fill="#d3d7dc">R</text></svg>`;
+  const topbar = () => `
+      <header class="site-head">
+        <div class="site-bar"><button class="site-menu" data-act="menu" aria-label="${T().menu}" aria-haspopup="dialog">${vec("menu", "#fff")}</button><span class="site-logo" role="img" aria-label="Kitco">${vec("mark")}${wordmark("kw-site", "kw")}${REG}</span></div>
+        <div class="lang" role="group" aria-label="${T().language}">
+          <button data-act="lang" data-v="en" class="${lang === "en" ? "active" : ""}" aria-pressed="${lang === "en"}" lang="en">EN</button>
+          <button data-act="lang" data-v="fr" class="${lang === "fr" ? "active" : ""}" aria-pressed="${lang === "fr"}" lang="fr">FR</button>
+        </div>
+        <div class="hero">
+          <h1 class="serif hero-title"><span class="for-desk">${T().heroTitle}</span><span class="for-phone">${T().heroMobile}</span></h1>
+          <p class="hero-sub">${T().heroSub}</p>
+        </div>
+      </header>
+      <header class="topbar">
+        <div class="bar">
+          <button class="menu" aria-label="${T().menu}">${vec("menu", "#fff")}</button>
+          <span class="mark" role="img" aria-label="Kitco">${vec("mark")}</span>
+          <span class="word">${wordmark("kw")}</span>
+          ${REG}
+        </div>
+      </header>`;
+
+  /* ---------- Kitco site menu: mirrors the hamburger menu on online.kitco.com ---------- */
+  const KITCO = "https://online.kitco.com";
+  const MENU = [
+    { h: "Home", href: "/" },
+    { h: "Reset Password", href: "/account/resetpassword/step1.html" },
+    { h: "Buy from Kitco", href: "/buy/gold-silver.html", items: [
+      ["All Products", "/buy/gold-silver.html"], ["In Stock Now", "/search?page=1&q=kitcobullion&minprice=1"],
+      ["VaultChain™ Gold", "/kitco-vault-chain-gold"], ["VaultChain™ Silver", "/kitco-vault-chain-silver"],
+      ["Kitco Pool - Metal Accounts", "/kitco-pool"], ["Deals", "/deals", "deal"], ["Gift Ideas", "/gift-ideas"],
+      ["Cool and Collectible", "/cool-and-collectible"], ["Gold", "#gold"], ["Silver", "#silver"], ["Platinum", "#platinum"],
+      ["Palladium", "/palladium"], ["Rhodium", "/rhodium"], ["MintFirst™", "/kitco-mint-first-coins"], ["Bullion Mints", "#mints"],
+      ["Kitco Exclusives", "/unique-gold-silver-exclusive"], ["Bundle Products", "/bundle-products"], ["Accessories", "/accessories"]] },
+    { h: "Sell to Kitco", href: "/sell/gold-silver.html?v=201811031", items: [
+      ["Coins and Bars", "/sell/gold-silver.html?v=201811031"], ["Other Products", "/sell/others.html"], ["Rhodium", "/sell/rhodium.html"],
+      ["Sell VaultChain™ Gold", "/kitco-vault-chain-gold#sell"], ["Sell VaultChain™ Silver", "/kitco-vault-chain-silver#sell"],
+      ["Sell Kitco Pool - Metal Accounts", "/kitco-pool#sell"], ["Refining and Scrap", "/refining/gold-silver.html"],
+      ["Selling Your Bullion", "/selling-bullion-bars-coins"]] },
+    { h: "Storage Programs", href: "/storage", items: [
+      ["Kitco Allocated Storage Program", "/storage"], ["Cayman Storage Program", "/cayman-storage-program"], ["IRA | RSP", "/ira-rsp/"]] },
+    { h: "Refining Services", href: "/refining", items: [
+      ["Jeweler Resources", "https://www.kitco.com/jeweler-resources"], ["Scrap Metal Calculator", "https://www.kitco.com/jeweler-resources"],
+      ["Refining and Scrap", "/refining/gold-silver.html"]] },
+    { h: "My Account", href: "/account/details.html", items: [
+      ["Create Account", "/create-account.html?fp=/"], ["Check Transaction Status", "/account/details.html"],
+      ["Forgot Email / Username", "/account/forgotusername/step1.html"], ["Reset Password", "/account/resetpassword/step1.html"]] },
+    { h: "Education", href: "/bullion-education/", items: [
+      ["Basic Understanding", "/bullion-education/basic-understanding/"], ["Fundamentals", "/fundamentals/"],
+      ["Investment Guide", "/bullion-investment-guide/"], ["Local Dealers", "/local/"], ["Bullion Terminology", "/bullion-terminology/"],
+      ["Why Choose Kitco", "/why-choose-kitco/"]] },
+    { h: "FAQs", href: "/faq", items: [
+      ["How do I Open a Kitco Account", "/faq/opening-an-account"], ["Account Maintenance", "/faq/account-maintenance"],
+      ["How Do I Fund my Account?", "/faq/funding-an-account"], ["How do I Send Payments to Kitco?", "/faq/bank-wire-payment-instructions"],
+      ["How to Buy Bullion", "/faq/how-to-buy-from-kitco"], ["How to Sell Bullion", "/faq/how-to-sell-to-kitco"],
+      ["How to Sell Scrap", "/faq/how-to-sell-scrap-metal"], ["Payments and Fees", "/faq/payments-and-fees"],
+      ["Shipping and Insurance", "/faq/shipping-and-insurance"], ["Cancellations", "/faq/cancellations"],
+      ["Bullion Bars & Coins", "/faq/product-information"], ["Kitco Pool - Metal Accounts", "/faq/kitco-pool-accounts"],
+      ["Kitco Allocated Storage", "/faq/kitco-allocated-storage"], ["Precious Metals IRA", "/faq/precious-metals-ira"],
+      ["VaultChain™ Gold & Silver", "/faq/vaultchain"], ["Bullion Terminology", "/bullion-terminology/"]] },
+    { h: "Kitco News", href: "https://www.kitco.com/" },
+    { h: "Subscribe", href: "/subscribe" },
+  ];
+  const SUBMENU = {
+    gold: { title: "Buy from Kitco / Gold", href: "/gold", groups: [
+      { h: "Gold Coins", href: "/gold-coins", items: [["All Gold Coins", "/gold-coins"], ["American Gold Eagles", "/american-gold-eagle-coins"],
+        ["American Gold Buffalos", "/american-gold-buffalo-coins"], ["Canadian Gold Maples", "/canadian-gold-maple-leaf-coins"],
+        ["South African Gold Krugerrands", "/south-african-gold-krugerrand-coins"], ["Australian Gold Kangaroos", "/australian-gold-kangaroos-coins"]] },
+      { h: "Gold Bars", href: "/gold-bars" }] },
+    silver: { title: "Buy from Kitco / Silver", href: "/silver", groups: [
+      { h: "Silver Coins", href: "/silver-coins", items: [["All Silver Coins", "/silver-coins"], ["American Silver Eagles", "/american-silver-eagle-coins"],
+        ["American Silver Buffalos", "/american-silver-buffalo-coins"], ["Canadian Silver Maple Leafs", "/canadian-silver-maple-leaf-coins"]] },
+      { h: "Silver Rounds", href: "/silver-rounds" }, { h: "Silver Bars", href: "/silver-bars?v=201811031" }] },
+    platinum: { title: "Buy from Kitco / Platinum", href: "/platinum", groups: [
+      { h: "Platinum Coins", href: "/platinum-coins" }, { h: "Platinum Bars", href: "/platinum-bars" }] },
+    mints: { title: "Buy from Kitco / Bullion Mints", href: "/bullion-mints", groups: [{ items: [
+      ["U.S. Mint", "/united-states-mint"], ["Royal Canadian Mint", "/royal-canadian-mint"], ["British Royal Mint", "/british-royal-mint"],
+      ["South African Mint", "/south-african-mint"], ["New Zealand Mint", "/new-zealand-mint"], ["Perth Mint", "/australia-perth-mint"],
+      ["Austrian Mint", "/austrian-mint"]] }] },
+  };
+  const kUrl = href => /^https?:/.test(href) ? href : KITCO + href;
+  const kLink = ([label, href, cls]) => href.startsWith("#")
+    ? `<li><button type="button" data-km="sub" data-v="${href.slice(1)}">${label}</button></li>`
+    : `<li><a href="${kUrl(href)}"${cls ? ` class="${cls}"` : ""}>${label}</a></li>`;
+  const kmenu = document.getElementById("kmenu");
+  function renderMenu() {
+    const t = T();
+    kmenu.innerHTML = `
+      <div class="km-backdrop" data-km="close"></div>
+      <nav class="km-panel">
+        <div class="km-head">
+          <div>${t.hello} <a href="${KITCO}/signin.html">${t.logIn}</a> ${t.or} <a href="${KITCO}/create-account.html">${t.createAccount}</a></div>
+          <button class="km-close" data-km="close" aria-label="${t.closeMenu}"><svg width="16" height="16" viewBox="0 0 16 16" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M2 2l12 12M14 2 2 14"/></svg></button>
+        </div>
+        <div class="km-pages">
+          <div class="km-page km-main">
+            ${MENU.map((m, i) => `${i ? "<hr>" : ""}<a class="km-h" href="${kUrl(m.href)}">${m.h}</a>${m.items ? `<ul>${m.items.map(kLink).join("")}</ul>` : ""}`).join("")}
+          </div>
+          <div class="km-page km-sub" aria-hidden="true"></div>
+        </div>
+      </nav>`;
+  }
+  function openSub(key) {
+    const m = SUBMENU[key], sub = kmenu.querySelector(".km-sub");
+    sub.innerHTML = `
+      <div class="km-back"><button type="button" data-km="back"><svg width="9" height="14" viewBox="0 0 9 14" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 1.5 2 7l5.5 5.5"/></svg>${T().back}</button></div>
+      <a class="km-h" href="${kUrl(m.href)}">${m.title}</a>
+      ${m.groups.map(g => `${g.h ? `<a class="km-group" href="${kUrl(g.href)}">${g.h}</a>` : ""}${g.items ? `<ul>${g.items.map(kLink).join("")}</ul>` : ""}`).join("")}`;
+    sub.removeAttribute("aria-hidden");
+    sub.scrollTop = 0;
+    kmenu.classList.add("sub");
+  }
+  let menuOpener = null;
+  function openMenu() {
+    menuOpener = document.activeElement;
+    renderMenu();
+    kmenu.classList.remove("sub");
+    requestAnimationFrame(() => { kmenu.classList.add("open"); kmenu.querySelector(".km-close").focus(); });
+  }
+  function closeMenu() {
+    kmenu.classList.remove("open");
+    menuOpener?.focus?.();
+  }
+  kmenu.addEventListener("click", e => {
+    const el = e.target.closest("[data-km]");
+    if (!el) return;
+    if (el.dataset.km === "close") closeMenu();
+    else if (el.dataset.km === "sub") openSub(el.dataset.v);
+    else if (el.dataset.km === "back") kmenu.classList.remove("sub");
+  });
+  addEventListener("keydown", e => { if (e.key === "Escape" && kmenu.classList.contains("open")) closeMenu(); });
+
+  /* ---------- screens ---------- */
+  function step1() {
+    const t = T();
+    const intents = [
+      { id: "buy", name: t.buy, desc: t.buyDesc, ic: vec("cart", "#000", .8) },
+      { id: "sell", name: t.sell, desc: t.sellDesc, ic: vec("box", "#000", .8) },
+    ];
+    const durations = [
+      { m: 30, name: fmtDuration(30), desc: t.d30 },
+      { m: 60, name: fmtDuration(60), desc: t.d60 },
+      { m: 120, name: fmtDuration(120), desc: t.d120 },
+    ];
+    return `
+      ${topbar()}
+      <main class="view s1">
+        <h1 class="serif page-title">${t.bookTitle}</h1>
+        ${progress(1)}
+        <div class="cols"><div class="col">
+        <h2 class="serif section">${t.whatDo}</h2>
+        ${intents.map(o => `
+          <button class="card intent ${state[o.id] ? "on" : ""}" role="checkbox" aria-checked="${state[o.id]}" data-act="intent" data-v="${o.id}">
+            <span class="icon">${o.ic}</span>
+            <span>
+              <span class="serif name">${o.name}<span class="tick">${icon.tick(18)}</span></span>
+              <span class="desc">${o.desc}</span>
+            </span>
+          </button>`).join("")}
+        </div><div class="col">
+        <h2 class="serif section second">${t.howLong}</h2>
+        <div role="radiogroup" aria-label="${t.duration}">
+        ${durations.map(o => `
+          <button class="card duration ${state.duration === o.m ? "on" : ""}" role="radio" aria-checked="${state.duration === o.m}" data-act="duration" data-v="${o.m}">
+            <span class="dot-radio"></span>
+            <span>
+              <span class="serif name">${o.name}</span>
+              <span class="desc">${o.desc}</span>
+            </span>
+          </button>`).join("")}
+        </div>
+        </div></div>
+        <div class="grow"></div>
+        <button class="btn s1" data-act="next" ${(state.buy || state.sell) && state.duration ? "" : "disabled"}>${t.cont}</button>
+      </main>`;
+  }
+
+  function step2() {
+    const t = T();
+    const vm = state.viewMonth, y = vm.getFullYear(), mo = vm.getMonth();
+    const lead = new Date(y, mo, 1).getDay(), count = new Date(y, mo + 1, 0).getDate();
+    const td = today(), atFirstMonth = y === td.getFullYear() && mo === td.getMonth();
+    let cells = "";
+    for (let i = 0; i < lead; i++) cells += "<span></span>";
+    for (let d = 1; d <= count; d++) {
+      const date = new Date(y, mo, d), open = isBookable(date);
+      cells += `<button class="day ${sameDay(date, state.date) ? "on" : ""}" data-act="date" data-v="${date.getTime()}" ${open ? "" : "disabled"} aria-label="${fmtLongDate(date)}${open ? "" : t.unavailable}"><span class="num">${d}</span><span class="dot"></span></button>`;
+    }
+    return `
+      ${topbar()}
+      <main class="view s2">
+        <div class="step-head"><div class="step-left">
+        ${progress(2)}
+        ${backBtn("arrow2")}
+        </div>
+        <h1 class="serif title">${t.chooseDate}</h1>
+        </div>
+        <div class="cols"><div class="col">
+        <div class="calendar ${avail.loading ? "loading" : ""}">
+          <div class="cal-head">
+            <h3 class="serif">${lang === "fr" ? t.months[mo][0].toUpperCase() + t.months[mo].slice(1) : t.months[mo]} ${y}</h3>
+            <button data-act="month" data-v="-1" aria-label="${t.prevMonth}" ${atFirstMonth ? "disabled" : ""}>${vec("chevL")}</button>
+            <button data-act="month" data-v="1" aria-label="${t.nextMonth}">${vec("chevR")}</button>
+          </div>
+          <div class="cal-grid">
+            ${t.dow.map(d => `<span class="dow">${d}</span>`).join("")}
+            ${cells}
+          </div>
+        </div>
+        </div><div class="col">
+        ${avail.loading ? `<p class="slots-note">${t.loadingTimes}</p>`
+          : avail.error ? `<p class="slots-note">${t.loadError} <button type="button" data-act="retry">${t.retry}</button></p>`
+          : state.date && slotsFor(state.date).length ? `
+          <h2 class="serif section">${lang === "fr" ? fmtLongDate(state.date).replace(/^./, c => c.toUpperCase()) : fmtLongDate(state.date)}</h2>
+          <div class="slots ${slotsFor(state.date).length > 12 ? "many" : ""}">
+            ${slotsFor(state.date).map(s => `<button class="slot ${state.time === s.m ? "on" : ""}" data-act="time" data-v="${s.m}" ${s.disabled ? "disabled" : ""}>${fmtTime(s.m)}</button>`).join("")}
+          </div>` : `<p class="slots-note">${Object.keys(avail.days).length ? t.pickDay : t.noTimes}</p>`}
+        </div></div>
+        <div class="grow"></div>
+        <button class="btn s2" data-act="next" ${state.date && state.time != null ? "" : "disabled"}>${t.cont}</button>
+      </main>`;
+  }
+
+  function step3() {
+    const t = T(), f = state.form, err = validate();
+    const bad = k => state.showErrors && err[k] ? "invalid" : "";
+    return `
+      ${topbar()}
+      <main class="view s3">
+        <div class="step-head"><div class="step-left">
+        ${progress(3)}
+        ${backBtn("arrow2")}
+        </div>
+        <h1 class="serif title">${t.prepare}</h1>
+        </div>
+        <div class="cols"><div class="col">
+        <form id="details" novalidate>
+          <div class="field ${bad("name")}">
+            <div class="box"><span class="lead">${vec("user")}</span><input name="name" autocomplete="name" placeholder="${t.namePh}" aria-label="${t.nameLbl}" value="${esc(f.name)}"></div>
+            <div class="err">${err.name || ""}</div>
+          </div>
+          <div class="field ${bad("email")}">
+            <div class="box"><span class="lead">${vec("mail")}</span><input name="email" type="email" inputmode="email" autocomplete="email" placeholder="${t.emailPh}" aria-label="${t.emailLbl}" value="${esc(f.email)}"></div>
+            <div class="err">${err.email || ""}</div>
+          </div>
+          <div class="field">
+            <label class="label" for="phone">${t.phone}</label>
+            <div class="box short">
+              <span class="plus" aria-hidden="true">+</span><input class="cc" name="cc" type="tel" inputmode="numeric" autocomplete="tel-country-code" maxlength="4" aria-label="${t.ccLbl}" value="${esc(f.cc.slice(1))}"><span class="vsep"></span>
+              <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="${f.cc === "+1" ? "(555) 123-4567" : t.phone}" value="${esc(f.phone)}">
+            </div>
+          </div>
+          <div class="field pair-row">
+          <div class="field ${bad("value")}">
+            <label class="label" for="value">${t.value}</label>
+            <div class="box shorter"><input id="value" name="value" inputmode="numeric" aria-label="${t.valueLbl}" value="${esc(f.value)}"></div>
+            <div class="err">${err.value || ""}</div>
+          </div>
+          <div class="field ${bad("account")}">
+            <span class="label">${t.account}</span>
+            <div class="radios" role="radiogroup" aria-label="${t.account}">
+              ${[["Yes", t.yes], ["No", t.no]].map(([v, label]) => `<label><input type="radio" name="account" value="${v}" ${f.account === v ? "checked" : ""}><span class="ring"></span>${label}</label>`).join("")}
+            </div>
+            <div class="err">${err.account || ""}</div>
+          </div>
+          </div>
+          <div class="field gap">
+            <label class="label" for="notes">${t.notesLbl}</label>
+            <div class="box area"><textarea id="notes" name="notes" placeholder="${t.notesPh}">${esc(f.notes)}</textarea></div>
+          </div>
+        </form>
+        </div><div class="col">
+
+        <div class="summary">
+          <div class="icon">${summaryIcon()}</div>
+          <div>
+            <div class="serif headline">${intentLabel()}<span class="sep">•</span>${fmtDuration(state.duration)}</div>
+            <div class="row">${vec("cal", "#000")}${fmtLongDate(state.date, true)}</div>
+            <div class="row">${vec("clock", "#000")}<span>${fmtRange(state.time, state.duration)}<span class="sep">•</span>${t.mtlTime}</span></div>
+            <div class="row">${vec("pin", "#000")}${t.address}</div>
+          </div>
+        </div>
+
+        <div class="checks">
+          <div class="${bad("terms")}">
+            <label><input type="checkbox" name="terms" ${f.terms ? "checked" : ""}><span class="sq">${icon.tick(12)}</span><span>${t.terms}</span></label>
+            <div class="err" style="margin:-4px 0 10px">${err.terms || ""}</div>
+          </div>
+          <label><input type="checkbox" name="promos" ${f.promos ? "checked" : ""}><span class="sq">${icon.tick(12)}</span><span>${t.promos}</span></label>
+        </div>
+
+        <div class="call">${vec("phone", "#000")}<span>${t.call}</span></div>
+        <button class="btn s3 ${state.sending ? "busy" : ""}" data-act="confirm" ${state.sending ? "disabled" : ""}>${state.sending ? t.booking : t.confirm}</button>
+        ${state.bookError ? `<p class="book-error" role="alert">${t.bookError}</p>` : ""}
+        </div></div>
+      </main>`;
+  }
+
+  function step4() {
+    const t = T();
+    return `
+      ${topbar()}
+      <main class="view s4">
+        ${progress(4)}
+        <div class="done">
+          ${successIcon()}
+          <h1 class="serif">${t.success}</h1>
+          ${t.thanks.map(x => `<p>${x}</p>`).join("")}
+          <button class="btn s4" data-act="close">${t.close}</button>
+        </div>
+      </main>`;
+  }
+
+  function validate() {
+    const t = T(), f = state.form, e = {};
+    if (!f.name.trim()) e.name = t.eName;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) e.email = t.eEmail;
+    const v = Number(digits(f.value));
+    if (!v) e.value = t.eValue;
+    if (!f.account) e.account = t.eAccount;
+    if (!f.terms) e.terms = t.eTerms;
+    return e;
+  }
+
+  async function submitBooking() {
+    const f = state.form;
+    state.sending = true; state.bookError = false; render(false);
+    const notes = [state.buy && state.sell ? "Buy & Sell" : "", f.notes.trim()].filter(Boolean).join(" — ");
+    try {
+      const res = await api.book(serviceId(), iso(state.date), hms(state.time),
+        { name: f.name.trim(), email: f.email.trim(), phone: digits(f.phone) ? `${f.cc} ${f.phone}` : "" },
+        { value: digits(f.value), account: f.account || "", notes });
+      if (!res || (Array.isArray(res.bookings) && !res.bookings.length)) throw new Error("No booking returned");
+      state.sending = false; go(4);
+    } catch (e) {
+      console.error(e);
+      state.sending = false; state.bookError = true; render(false);
+    }
+  }
+
+  /* ---------- render & events ---------- */
+  const key = el => el.dataset.act + ":" + el.dataset.v;
+  function render(newStep = true) {
+    // remember what was selected / enabled so the changes can be animated
+    const wasOn = new Set([...app.querySelectorAll("[data-v].on")].map(key));
+    const btnBefore = app.querySelector(".btn[data-act=next]")?.disabled;
+    document.documentElement.lang = lang;
+    document.title = T().docTitle;
+    app.className = "app" + (state.step === 1 ? " has-topbar" : "") + (newStep ? "" : " still");
+    app.innerHTML = [null, step1, step2, step3, step4][state.step]();
+    if (!newStep) {
+      app.querySelectorAll("[data-v]").forEach(el => {
+        const on = el.classList.contains("on"), was = wasOn.has(key(el));
+        if (on !== was) el.classList.add(on ? "anim-in" : "anim-out");
+      });
+      const btn = app.querySelector(".btn[data-act=next]");
+      if (btn && btnBefore !== undefined && btn.disabled !== btnBefore) btn.classList.add(btn.disabled ? "disabling" : "enabling");
+    }
+    if (newStep) scroller.scrollTop = 0;
+    fit();
+  }
+
+  // Every screen must fit without scrolling: if the content is taller than the screen,
+  // scale the whole screen down just enough to fit.
+  // Phones: size steps 1 and 3 so they reach just above the button (never past it).
+  function fill() {
+    const cols = app.querySelector("main.s1 .cols, main.s3 .cols");
+    if (!cols) return;
+    cols.style.setProperty("--k", 1);
+    if (document.documentElement.classList.contains("shot") || !matchMedia("(max-width: 599px)").matches) return;
+    const avail = scroller.clientHeight - 8;
+    const need = () => { app.classList.add("measure"); const h = app.scrollHeight; app.classList.remove("measure"); return h; };
+    // grow or shrink the content so it ends just above the button (bounded; fit() handles anything beyond)
+    let lo = .7, hi = 1.5;
+    for (let i = 0; i < 10; i++) {
+      const mid = (lo + hi) / 2;
+      cols.style.setProperty("--k", mid);
+      if (need() <= avail) lo = mid; else hi = mid;
+    }
+    cols.style.setProperty("--k", lo);
+  }
+
+  // Desktop is designed at this width and scaled to the window, so it keeps the same proportions at any size.
+  const DESIGN_W = 1306;
+  function fit() {
+    Object.assign(app.style, { transform: "", width: "", height: "", minHeight: "", marginRight: "", marginBottom: "" });
+    fill();
+    const avail = scroller.clientHeight, w = scroller.clientWidth;
+    const measure = () => { app.classList.add("measure"); const h = app.scrollHeight; app.classList.remove("measure"); return h; };
+    let z = 1;
+    if (!document.documentElement.classList.contains("shot") && w >= 960) {
+      // scale to the width; if that is too tall for the window, shrink further. A wider layout makes the
+      // banner taller, so repeat until it settles.
+      const main = app.querySelector("main");
+      main.style.setProperty("--dk", 1);
+      z = w / DESIGN_W;
+      app.style.width = DESIGN_W + "px";
+      if (measure() * z <= avail) {
+        // room to spare: enlarge the card until the page fills the window height
+        let lo = 1, hi = 1.3;
+        for (let i = 0; i < 10; i++) {
+          const mid = (lo + hi) / 2;
+          main.style.setProperty("--dk", mid);
+          if (measure() * z <= avail) lo = mid; else hi = mid;
+        }
+        main.style.setProperty("--dk", lo);
+      } else {
+        for (let i = 0; i < 6; i++) {
+          app.style.width = w / z + "px";
+          const need = measure();
+          if (need * z <= avail + .5) break;
+          z = avail / need;
+        }
+      }
+      app.style.width = "";
+    } else {
+      const need = measure();
+      if (need <= avail) { scroller.style.overflowY = ""; return; }
+      z = avail / need;
+    }
+    Object.assign(app.style, {
+      transform: `scale(${z})`, transformOrigin: "0 0",
+      width: w / z + "px", height: avail / z + "px", minHeight: "0",
+      marginRight: w - w / z + "px", marginBottom: avail - avail / z + "px",
+    });
+    scroller.style.overflowY = "hidden";
+  }
+  let lastSize = "";
+  addEventListener("resize", () => {
+    // ignore the on-screen keyboard opening while typing
+    if (document.activeElement?.matches("input, textarea, select")) return;
+    const size = innerWidth + "x" + innerHeight;
+    if (size !== lastSize) { lastSize = size; fit(); }
+  });
+
+  // Prata is spaced differently from Bodoni 72; switch spacing when Bodoni 72 isn't on the device.
+  function hasFamily(name) {
+    const c = document.createElement("canvas").getContext("2d"), t = "Bookx & 72";
+    c.font = "40px monospace"; const base = c.measureText(t).width;
+    c.font = `40px "${name}", monospace`; return c.measureText(t).width !== base;
+  }
+  document.fonts.load('16px "Bodoni72"').catch(() => []).then(faces => {
+    if (!faces.length && !hasFamily("Bodoni 72") && !hasFamily("Bodoni Svntytwo ITC Pro Book")) document.documentElement.classList.add("alt-serif");
+    return document.fonts.ready;
+  }).then(fit);
+  function go(step) { state.step = step; render(); }
+
+  app.addEventListener("click", e => {
+    const el = e.target.closest("[data-act]");
+    if (!el || el.disabled) return;
+    const v = el.dataset.v;
+    switch (el.dataset.act) {
+      case "menu": openMenu(); break;
+      case "intent": state[v] = !state[v]; render(false); break;
+      case "lang":
+        if (v !== lang) { lang = v; try { localStorage.setItem("lang", v); } catch (e) {} render(false); }
+        break;
+      case "duration": state.duration = Number(v); render(false); break;
+      case "back": go(state.step - 1); break;
+      case "next":
+        if (state.step === 1) {
+          // a new service may have different times: start from this month and the first open day
+          const key = serviceId() + ":";
+          if (!avail.key.startsWith(key) || !state.date) {
+            state.date = null; state.time = null;
+            const t0 = today();
+            state.viewMonth = new Date(t0.getFullYear(), t0.getMonth(), 1);
+            avail.key = "";
+            go(2);
+            loadMonth(true);
+            break;
+          }
+        }
+        go(state.step + 1); break;
+      case "retry": avail.key = ""; loadMonth(!state.date); break;
+      case "month": {
+        const m = state.viewMonth;
+        state.viewMonth = new Date(m.getFullYear(), m.getMonth() + Number(v), 1);
+        render(false);
+        loadMonth();                       // shows the loading state right away
+        app.querySelectorAll(".cal-head h3, .cal-grid").forEach(el => el.classList.add(Number(v) > 0 ? "month-next" : "month-prev"));
+        break;
+      }
+      case "date": state.date = new Date(Number(v)); state.time = null; render(false); break;
+      case "time": state.time = Number(v); render(false); break;
+      case "confirm":
+        if (Object.keys(validate()).length) {
+          state.showErrors = true;
+          render(false);
+          app.querySelector(".invalid")?.scrollIntoView({ behavior: "smooth", block: "center" });
+          return;
+        }
+        submitBooking(); break;
+      case "close": location.href = KITCO + "/"; break;
+    }
+  });
+
+  // Form fields update state in place; errors clear as soon as a field becomes valid.
+  app.addEventListener("input", e => {
+    const t = e.target, f = state.form;
+    if (!t.name || !(t.name in f)) return;
+    if (t.type === "checkbox") f[t.name] = t.checked;
+    else if (t.type === "radio") f[t.name] = t.value;
+    else if (t.name === "cc") {
+      // digits only after the fixed "+"; reformat the number for the new code without re-rendering (keeps focus)
+      t.value = digits(t.value).slice(0, 4);
+      f.cc = "+" + t.value;
+      const ph = app.querySelector("[name=phone]");
+      f.phone = ph.value = fmtPhone(f.phone, f.cc);
+      ph.placeholder = f.cc === "+1" ? "(555) 123-4567" : "Phone number";
+    }
+    else if (t.name === "phone") { f.phone = fmtPhone(t.value, f.cc); t.value = f.phone; }
+    else if (t.name === "value") { f.value = fmtMoney(t.value); t.value = f.value; }
+    else f[t.name] = t.value;
+
+    if (state.showErrors) {
+      const err = validate();
+      app.querySelectorAll(".invalid").forEach(box => {
+        const inp = box.querySelector("input, textarea");
+        if (inp && !(inp.name in err)) box.classList.remove("invalid");
+      });
+    }
+  });
+  app.addEventListener("submit", e => e.preventDefault());
+
+  document.getElementById("demo-badge").hidden = !(DEMO && !shot);
+  if (shot) {
+    document.documentElement.classList.add("shot");
+    if (!new URLSearchParams(location.search).get("lang")) lang = "en";
+    if (shot > 1) {
+      Object.assign(state, { step: shot, buy: true, duration: 30, date: new Date(2026, 9, 20), viewMonth: new Date(2026, 9, 1), time: 600 });
+      loadMonth();
+    }
+  }
+  render();
+})();
+</script>
+</body>
+</html>
