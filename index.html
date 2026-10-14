@@ -245,6 +245,12 @@
     padding: 5px 10px; border-radius: 99px; box-shadow: 0 1px 4px rgba(0, 0, 0, .2); pointer-events: none;
   }
   .demo-badge[hidden] { display: none; }
+  .demo-badge .short { display: none; }
+  @media (max-width: 599px) {
+    .demo-badge { left: auto; right: 98px; top: calc(env(safe-area-inset-top) + 17px); transform: none; padding: 5px 8px; }
+    .demo-badge .long { display: none; }
+    .demo-badge .short { display: inline; }
+  }
   @media (min-width: 960px) { html:not(.shot) .s2 .slots.many { max-height: calc(4 * 44px + 3 * 8px); } }
 
   /* layout wrappers only matter on larger screens */
@@ -591,7 +597,7 @@
 </div>
 
 <div class="kmenu" id="kmenu" role="dialog" aria-modal="true" aria-label="Kitco menu"></div>
-<div class="demo-badge" id="demo-badge" hidden>Demo mode · no real bookings</div>
+<div class="demo-badge" id="demo-badge" hidden><span class="long">Demo mode · no real bookings</span><span class="short">DEMO</span></div>
 
 <script src="config.js"></script>
 <script>
