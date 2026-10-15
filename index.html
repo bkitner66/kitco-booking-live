@@ -236,7 +236,7 @@
   .slots-note { font-size: 14px; color: #4f5c86; margin: 4px 0 0; line-height: 1.4; }
   .slots-note button { background: none; border: 0; padding: 0; color: var(--teal); text-decoration: underline; font: inherit; cursor: pointer; }
   .loading .day { opacity: .45; }
-  .slots.many { max-height: calc(4 * 36px + 3 * 8px); overflow-y: auto; padding-right: 2px; }
+  .slots.many { max-height: calc(6 * 36px + 5 * 8px); overflow-y: auto; padding-right: 2px; }
   .book-error { color: var(--error); font-size: 13px; margin: 8px 0 0; text-align: center; }
   .btn.busy { opacity: .7; cursor: progress; }
   .demo-badge {
@@ -251,7 +251,7 @@
     .demo-badge .long { display: none; }
     .demo-badge .short { display: inline; }
   }
-  @media (min-width: 960px) { html:not(.shot) .s2 .slots.many { max-height: calc(4 * 44px + 3 * 8px); } }
+  @media (min-width: 960px) { html:not(.shot) .s2 .slots.many { max-height: calc(7 * 44px + 6 * 8px); } }
 
   /* layout wrappers only matter on larger screens */
   .cols, .col, .step-head, .step-left { display: contents; }
@@ -308,7 +308,9 @@
     html:not(.shot) .s2 .day .dot { width: 5px; height: 5px; }
     html:not(.shot) .s2 .day.on .dot { margin-top: 7px; }
     html:not(.shot) .s2 .col h2.section { font-size: 28px; line-height: 32px; margin-bottom: 16px; }
-    html:not(.shot) .s2 .slot { height: 44px; font-size: 16px; }
+    html:not(.shot) .s2 .slot { height: 44px; font-size: 15px; }
+    /* desktop: 4 times per row, up to 7 rows without scrolling */
+    html:not(.shot) .s2 .slots { grid-template-columns: repeat(4, 1fr); }
     html:not(.shot) .s2 .col h2.section { margin-top: 0; }
     html:not(.shot) .s3 .cols { margin-top: 22px; align-items: center; }
     html:not(.shot) .step-head { display: grid; grid-template-columns: auto 1fr; column-gap: 54px; align-items: start; }
