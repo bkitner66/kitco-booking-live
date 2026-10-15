@@ -288,7 +288,7 @@
 
   /* ---------- Desktop (960px and up): two columns ---------- */
   @media (min-width: 960px) {
-    html:not(.shot) main { width: 960px; padding: 34px 48px 34px; margin: 26px auto; zoom: var(--dk, 1); }
+    html:not(.shot) main { width: calc(1248px / var(--dk, 1)); padding: 34px 48px 34px; margin: 26px auto; zoom: var(--dk, 1); }
     html:not(.shot) .grow { height: 18px; }
     html:not(.shot) .page-title { font-size: 36px; line-height: 42px; }
     html:not(.shot) h1.title { font-size: 34px; line-height: 40px; }
@@ -297,6 +297,11 @@
     html:not(.shot) .col { display: block; min-width: 0; }
     html:not(.shot) .s1 .cols { margin-top: 24px; }
     html:not(.shot) .s1 h2.section, html:not(.shot) .s1 h2.section.second { margin: 0 0 12px; }
+    html:not(.shot) .s1 .card.intent .desc { max-width: none; }
+    /* Continue sits in the empty space under Buy/Sell, so the text can use the freed row */
+    html:not(.shot) main.s1 { position: relative; }
+    html:not(.shot) main.s1 .grow { display: none; }
+    html:not(.shot) main.s1 .btn.s1 { position: absolute; left: 48px; bottom: 34px; width: calc((100% - 96px - 48px) / 2); margin: 0; }
     html:not(.shot) .s2 .cols { margin-top: 24px; grid-template-columns: 1.3fr 1fr; }
     html:not(.shot) .s2 .calendar { padding: 18px 6px 8px; }
     html:not(.shot) .s2 .cal-head { padding: 0 8px 14px 20px; }
@@ -1314,16 +1319,15 @@
       main.style.setProperty("--dk", 1);
       z = w / DESIGN_W;
       app.style.width = DESIGN_W + "px";
-      if (measure() * z <= avail) {
-        // room to spare: enlarge the card until the page fills the window height
-        let lo = 1, hi = 1.3;
-        for (let i = 0; i < 10; i++) {
-          const mid = (lo + hi) / 2;
-          main.style.setProperty("--dk", mid);
-          if (measure() * z <= avail) lo = mid; else hi = mid;
-        }
-        main.style.setProperty("--dk", lo);
-      } else {
+      // The card is always the same width; size its contents so the page fills the window height.
+      let lo = .75, hi = 1.5;
+      for (let i = 0; i < 12; i++) {
+        const mid = (lo + hi) / 2;
+        main.style.setProperty("--dk", mid);
+        if (measure() * z <= avail) lo = mid; else hi = mid;
+      }
+      main.style.setProperty("--dk", lo);
+      if (measure() * z > avail) {
         for (let i = 0; i < 6; i++) {
           app.style.width = w / z + "px";
           const need = measure();
