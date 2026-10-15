@@ -135,12 +135,12 @@
   .site-logo .kw { width: 58.3%; margin-left: 3.5%; }
   .site-logo .reg { width: 5.7%; margin-left: .6%; align-self: flex-start; }
   .hero {
-    position: relative; min-height: clamp(150px, 14.1cqw, 302px); padding: clamp(20px, 2.2cqw, 48px) 24px clamp(18px, 2cqw, 44px);
+    position: relative; min-height: clamp(112px, 10.6cqw, 226px); padding: clamp(15px, 1.65cqw, 36px) 24px clamp(14px, 1.5cqw, 33px);
     background: #2c3846 url("assets/counter.jpg") center / cover no-repeat; color: #fff; text-align: center;
     display: flex; flex-direction: column; justify-content: center;
   }
-  .hero-title { text-wrap: balance; color: #fff !important; font-size: clamp(28px, 4cqw, 84px); line-height: 1.12; margin: 0; letter-spacing: 0 !important; text-shadow: 0 1px 12px rgba(0, 0, 0, .25); }
-  .hero-sub { text-wrap: balance; font: 400 clamp(16px, 2.56cqw, 54px)/1.3 "Figtree", var(--sans); margin: .45em 0 0; color: #f4f6f8; text-shadow: 0 1px 10px rgba(0, 0, 0, .25); }
+  .hero-title { text-wrap: balance; color: #fff !important; font-size: clamp(24px, 3cqw, 63px); line-height: 1.12; margin: 0; letter-spacing: 0 !important; text-shadow: 0 1px 12px rgba(0, 0, 0, .25); }
+  .hero-sub { text-wrap: balance; font: 400 clamp(14px, 1.92cqw, 41px)/1.3 "Figtree", var(--sans); margin: .45em 0 0; color: #f4f6f8; text-shadow: 0 1px 10px rgba(0, 0, 0, .25); }
   .lang {
     position: absolute; top: calc(clamp(38px, 2.9cqw, 68px) + clamp(10px, 1.2cqw, 26px)); right: clamp(14px, 2.44cqw, 55px); display: flex; z-index: 1;
     background: #f4f6f7; border-radius: clamp(6px, .45cqw, 9px); padding: 2px; box-shadow: 0 2px 10px rgba(0, 0, 0, .18);
@@ -297,22 +297,18 @@
     html:not(.shot) .col { display: block; min-width: 0; }
     html:not(.shot) .s1 .cols { margin-top: 24px; }
     html:not(.shot) .s1 h2.section, html:not(.shot) .s1 h2.section.second { margin: 0 0 12px; }
-    /* Step 1: the card is as wide as the other steps, but the boxes keep their original size (content 864px wide);
-       headings match "Choose a date & time" and the box titles / Buy-Sell text are larger. fit() measures the
-       original layout (.s1-base) and then locks each box at that height. */
-    html:not(.shot) main.s1 { padding-left: calc((1248px / var(--dk, 1) - 864px) / 2); padding-right: calc((1248px / var(--dk, 1) - 864px) / 2); }
-    html:not(.shot) .s1 h2.section, html:not(.shot) .s1 h2.section.second { font-size: 38px; line-height: 44px; margin: 0 0 12px; }
+    /* Step 1: the card is as wide as the other steps; content stays 864px wide and centred. */
+    html:not(.shot) main.s1 { padding-left: calc(114px / var(--dk, 1)); padding-right: calc(114px / var(--dk, 1)); }
+    html:not(.shot) .s1 h2.section, html:not(.shot) .s1 h2.section.second { font-size: calc(44.8px / var(--dk, 1)); line-height: 1.15; margin: 0 0 12px; }
     html:not(.shot) .s1 .cols { margin-top: 8px; }
     /* the French duration question is much longer: keep it on one line */
     html:lang(fr):not(.shot) .s1 h2.section.second { font-size: 28px; white-space: nowrap; }
-    html:not(.shot) .s1 .card .name { font-size: 24px; line-height: 26px; }
-    html:not(.shot) .s1 .card.duration { padding: 6px 0 7px; overflow: hidden; }
-    html:not(.shot) .s1 .card.intent .desc { font-size: 15px; line-height: 17.5px; max-width: 250px; }
-    html:not(.shot) .s1-base .s1 h2.section, html:not(.shot) .s1-base .s1 h2.section.second { font-size: 24px; line-height: 28px; }
-    html:not(.shot) .s1-base .s1 .cols { margin-top: 24px; }
-    html:not(.shot) .s1-base .s1 .card .name { font-size: 21px; line-height: 24px; }
-    html:not(.shot) .s1-base .s1 .card.duration { padding: 7px 0 8px; }
-    html:not(.shot) .s1-base .s1 .card.intent .desc { font-size: 13.2px; line-height: 16px; max-width: 200px; }
+    html:not(.shot) .s1 .card .name { font-size: calc(28px / var(--dk, 1)); line-height: 1.15; }
+    html:not(.shot) .s1 .card.intent { height: auto; min-height: 70px; padding: 10px 14px 12px 0; }
+    html:not(.shot) .s1 .card.duration { padding: 9px 14px 11px 0; }
+    html:not(.shot) .s1 .card .ic-cart, html:not(.shot) .s1 .card .ic-box { top: 50%; transform: translateY(-50%); }
+    /* descriptions match the size of step 3's placeholder text (13.1px at step 3's 1.5 scale) */
+    html:not(.shot) .s1 .card .desc, html:not(.shot) .s1 .card.intent .desc { font-size: calc(19.6px / var(--dk, 1)); line-height: 1.3; max-width: none; margin-top: 3px; }
     html:not(.shot) .s2 .cols { margin-top: 24px; grid-template-columns: 1.3fr 1fr; }
     html:not(.shot) .s2 .calendar { padding: 18px 6px 8px; }
     html:not(.shot) .s2 .cal-head { padding: 0 8px 14px 20px; }
@@ -523,7 +519,7 @@
   /* ---------- Colours sampled from the mockups ---------- */
   .serif { color: #000215; }
   .page-title { color: #000; }
-  .card .desc { color: #4d5674; }
+  .card .desc { color: #5f6d94; font-weight: 400; }
   .step-label { color: #3f4a68; }
   .dot-radio { border-color: #056f8e; }
   .tick { border-color: #056f8e; }
@@ -1084,7 +1080,7 @@
           <button class="card intent ${state[o.id] ? "on" : ""}" role="checkbox" aria-checked="${state[o.id]}" data-act="intent" data-v="${o.id}">
             <span class="icon">${o.ic}</span>
             <span>
-              <span class="serif name">${o.name}<span class="tick">${icon.tick(18)}</span></span>
+              <span class="serif name"><span class="tick">${icon.tick(18)}</span>${o.name}</span>
               <span class="desc">${o.desc}</span>
             </span>
           </button>`).join("")}
@@ -1333,19 +1329,13 @@
       // The card is always the same width; size its contents so the page fills the window height.
       // Step 1 is sized on its original layout, then its boxes are locked at those heights.
       const s1 = main.classList.contains("s1");
-      if (s1) { main.querySelectorAll(".card").forEach(c => c.style.height = ""); app.classList.add("s1-base"); }
-      let lo = .75, hi = 1.5;
+      let lo = s1 ? 1.18 : .75, hi = s1 ? 1.18 : 1.5;
       for (let i = 0; i < 12; i++) {
         const mid = (lo + hi) / 2;
         main.style.setProperty("--dk", mid);
         if (measure() * z <= avail) lo = mid; else hi = mid;
       }
       main.style.setProperty("--dk", lo);
-      if (s1) {
-        const cards = [...main.querySelectorAll(".card")], hs = cards.map(c => getComputedStyle(c).height);
-        app.classList.remove("s1-base");
-        cards.forEach((c, i) => c.style.height = hs[i]);
-      }
       if (measure() * z > avail) {
         for (let i = 0; i < 6; i++) {
           app.style.width = w / z + "px";
