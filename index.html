@@ -300,7 +300,11 @@
     /* Step 1: the card is as wide as the other steps; content stays 864px wide and centred. */
     html:not(.shot) main.s1 { padding-left: calc(28px / var(--dk, 1)); padding-right: calc(28px / var(--dk, 1)); }
     /* wider duration column so each description fits on two lines */
-    html:not(.shot) .s1 .cols { grid-template-columns: max-content 1fr; column-gap: calc(30px / var(--dk, 1)); }
+    html:not(.shot) .s1 .cols { grid-template-columns: max-content max-content; justify-content: space-between; column-gap: calc(30px / var(--dk, 1)); }
+    /* duration column = its heading plus a little room on each side; boxes no wider than that */
+    html:not(.shot) .s1 h2.section.second { padding: 0 calc(64px / var(--dk, 1)); }
+    html:not(.shot) .s1 .card.duration { contain: inline-size; grid-template-columns: calc(46px * 1.18 / var(--dk, 1)) 1fr; padding-right: calc(10px / var(--dk, 1)); }
+    html:not(.shot) .s1 .card.duration .dot-radio { margin-left: calc(14px * 1.18 / var(--dk, 1)); }
     html:not(.shot) .s1 h2.section { white-space: nowrap; }
     html:not(.shot) .s1 .card.intent { contain: inline-size; }   /* left column is as wide as its heading */
     /* Continue: identical to step 2's button (step 2 draws it at scale 1.18) */
@@ -402,7 +406,7 @@
   .card.intent > span:last-child { padding-top: 1px; }
 
   .tick {
-    width: 24px; height: 24px; flex: none; border: 2.5px solid var(--teal); border-radius: 5px;
+    width: 24px; height: 24px; flex: none; border: 3px solid var(--teal); border-radius: 5px;
     display: inline-flex; align-items: center; justify-content: center; background: #fff; transition: background .15s;
   }
   .tick svg { opacity: 0; }
@@ -410,7 +414,7 @@
   .card.on .tick svg { opacity: 1; }
 
   .dot-radio {
-    width: 22px; height: 22px; flex: none; border: 2.5px solid #056f8e; border-radius: 50%;
+    width: 22px; height: 22px; flex: none; border: 3px solid #056f8e; border-radius: 50%;
     display: inline-flex; align-items: center; justify-content: center; margin: 3px 0 0 18px;
   }
   .dot-radio::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: #056f8e; transform: scale(0); transition: transform .15s; }
