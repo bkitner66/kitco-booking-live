@@ -645,7 +645,7 @@
       confirm: "Confirm Booking",
       success: "Success!", thanks: ["You’re all set! We’ve emailed you a confirmation with everything you need to know for your appointment.", "If you need to change your plans, use the links in the email to reschedule or cancel.", "Thank you! Our team looks forward to welcoming you."],
       close: "Close",
-      eName: "Please enter your name.", eEmail: "Please enter a valid email address.", eValue: "Please enter an estimated value.",
+      eName: "Please enter your name.", ePhone: "Please enter your phone number.", ePhoneBad: "Please enter a complete phone number, including the country code.", eEmail: "Please enter a valid email address.", eValue: "Please enter an estimated value.",
       eAccount: "Please choose Yes or No.", eTerms: "Please accept the terms and conditions.",
     },
     fr: {
@@ -686,7 +686,7 @@
       confirm: "Confirmer le rendez-vous",
       success: "Confirmé!", thanks: ["C’est confirmé! Nous vous avons envoyé par courriel une confirmation avec tout ce qu’il faut savoir pour votre rendez-vous.", "Si vos plans changent, utilisez les liens dans le courriel pour reporter ou annuler votre rendez-vous.", "Merci! Notre équipe a hâte de vous accueillir."],
       close: "Fermer",
-      eName: "Veuillez entrer votre nom.", eEmail: "Veuillez entrer une adresse courriel valide.", eValue: "Veuillez entrer une valeur estimée.",
+      eName: "Veuillez entrer votre nom.", ePhone: "Veuillez entrer votre numéro de téléphone.", ePhoneBad: "Veuillez entrer un numéro de téléphone complet, avec l’indicatif de pays.", eEmail: "Veuillez entrer une adresse courriel valide.", eValue: "Veuillez entrer une valeur estimée.",
       eAccount: "Veuillez choisir Oui ou Non.", eTerms: "Veuillez accepter les conditions générales.",
     },
   };
@@ -1158,12 +1158,13 @@
             <div class="box"><span class="lead">${vec("mail")}</span><input name="email" type="email" inputmode="email" autocomplete="email" placeholder="${t.emailPh}" aria-label="${t.emailLbl}" value="${esc(f.email)}"></div>
             <div class="err">${err.email || ""}</div>
           </div>
-          <div class="field">
+          <div class="field ${bad("phone")}">
             <label class="label" for="phone">${t.phone}</label>
             <div class="box short">
               <span class="plus" aria-hidden="true">+</span><input class="cc" name="cc" type="tel" inputmode="numeric" autocomplete="tel-country-code" maxlength="4" aria-label="${t.ccLbl}" value="${esc(f.cc.slice(1))}"><span class="vsep"></span>
               <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="${f.cc === "+1" ? "(555) 123-4567" : t.phone}" value="${esc(f.phone)}">
             </div>
+            <div class="err">${err.phone || ""}</div>
           </div>
           <div class="field pair-row">
           <div class="field ${bad("value")}">
@@ -1229,6 +1230,9 @@
   function validate() {
     const t = T(), f = state.form, e = {};
     if (!f.name.trim()) e.name = t.eName;
+    const ph = digits(f.phone), cc = digits(f.cc);
+    if (!ph) e.phone = t.ePhone;
+    else if (!cc || (cc === "1" ? ph.length !== 10 : ph.length < 6)) e.phone = t.ePhoneBad;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) e.email = t.eEmail;
     const v = Number(digits(f.value));
     if (!v) e.value = t.eValue;
@@ -1432,7 +1436,8 @@
       const err = validate();
       app.querySelectorAll(".invalid").forEach(box => {
         const inp = box.querySelector("input, textarea");
-        if (inp && !(inp.name in err)) box.classList.remove("invalid");
+        const names = [...box.querySelectorAll("input, textarea")].map(i => i.name === "cc" ? "phone" : i.name);
+        if (inp && !names.some(n => n in err)) box.classList.remove("invalid");
       });
     }
   });
