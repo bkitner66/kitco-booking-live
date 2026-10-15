@@ -297,11 +297,22 @@
     html:not(.shot) .col { display: block; min-width: 0; }
     html:not(.shot) .s1 .cols { margin-top: 24px; }
     html:not(.shot) .s1 h2.section, html:not(.shot) .s1 h2.section.second { margin: 0 0 12px; }
-    html:not(.shot) .s1 .card.intent .desc { max-width: none; }
-    /* Continue sits in the empty space under Buy/Sell, so the text can use the freed row */
-    html:not(.shot) main.s1 { position: relative; }
-    html:not(.shot) main.s1 .grow { display: none; }
-    html:not(.shot) main.s1 .btn.s1 { position: absolute; left: 48px; bottom: 34px; width: calc((100% - 96px - 48px) / 2); margin: 0; }
+    /* Step 1: the card is as wide as the other steps, but the boxes keep their original size (content 864px wide);
+       headings match "Choose a date & time" and the box titles / Buy-Sell text are larger. fit() measures the
+       original layout (.s1-base) and then locks each box at that height. */
+    html:not(.shot) main.s1 { padding-left: calc((1248px / var(--dk, 1) - 864px) / 2); padding-right: calc((1248px / var(--dk, 1) - 864px) / 2); }
+    html:not(.shot) .s1 h2.section, html:not(.shot) .s1 h2.section.second { font-size: 38px; line-height: 44px; margin: 0 0 12px; }
+    html:not(.shot) .s1 .cols { margin-top: 8px; }
+    /* the French duration question is much longer: keep it on one line */
+    html:lang(fr):not(.shot) .s1 h2.section.second { font-size: 28px; white-space: nowrap; }
+    html:not(.shot) .s1 .card .name { font-size: 24px; line-height: 26px; }
+    html:not(.shot) .s1 .card.duration { padding: 6px 0 7px; overflow: hidden; }
+    html:not(.shot) .s1 .card.intent .desc { font-size: 15px; line-height: 17.5px; max-width: 250px; }
+    html:not(.shot) .s1-base .s1 h2.section, html:not(.shot) .s1-base .s1 h2.section.second { font-size: 24px; line-height: 28px; }
+    html:not(.shot) .s1-base .s1 .cols { margin-top: 24px; }
+    html:not(.shot) .s1-base .s1 .card .name { font-size: 21px; line-height: 24px; }
+    html:not(.shot) .s1-base .s1 .card.duration { padding: 7px 0 8px; }
+    html:not(.shot) .s1-base .s1 .card.intent .desc { font-size: 13.2px; line-height: 16px; max-width: 200px; }
     html:not(.shot) .s2 .cols { margin-top: 24px; grid-template-columns: 1.3fr 1fr; }
     html:not(.shot) .s2 .calendar { padding: 18px 6px 8px; }
     html:not(.shot) .s2 .cal-head { padding: 0 8px 14px 20px; }
@@ -1320,6 +1331,9 @@
       z = w / DESIGN_W;
       app.style.width = DESIGN_W + "px";
       // The card is always the same width; size its contents so the page fills the window height.
+      // Step 1 is sized on its original layout, then its boxes are locked at those heights.
+      const s1 = main.classList.contains("s1");
+      if (s1) { main.querySelectorAll(".card").forEach(c => c.style.height = ""); app.classList.add("s1-base"); }
       let lo = .75, hi = 1.5;
       for (let i = 0; i < 12; i++) {
         const mid = (lo + hi) / 2;
@@ -1327,6 +1341,11 @@
         if (measure() * z <= avail) lo = mid; else hi = mid;
       }
       main.style.setProperty("--dk", lo);
+      if (s1) {
+        const cards = [...main.querySelectorAll(".card")], hs = cards.map(c => getComputedStyle(c).height);
+        app.classList.remove("s1-base");
+        cards.forEach((c, i) => c.style.height = hs[i]);
+      }
       if (measure() * z > avail) {
         for (let i = 0; i < 6; i++) {
           app.style.width = w / z + "px";
