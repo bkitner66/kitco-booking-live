@@ -306,12 +306,12 @@
     /* Continue: identical to step 2's button (step 2 draws it at scale 1.18) */
     html:not(.shot) main.s1 .btn.s1 {
       width: calc(260px * 1.18 / var(--dk, 1)); height: calc(46px * 1.18 / var(--dk, 1)); border-radius: calc(6px * 1.18 / var(--dk, 1));
-      font-size: calc(18.5px * 1.18 / var(--dk, 1)); font-weight: 400; background: #0a7192; margin-top: calc(18px * 1.18 / var(--dk, 1));
+      font-size: var(--btnfs, calc(18.5px * 1.18 / var(--dk, 1))); font-weight: 400; background: #0a7192; margin-top: calc(18px * 1.18 / var(--dk, 1));
     }
     html:not(.shot) .s1 h2.section, html:not(.shot) .s1 h2.section.second { font-size: calc(44.8px / var(--dk, 1)); line-height: 1.15; margin: 0 0 12px; }
     html:not(.shot) .s1 .cols { margin-top: 8px; }
-    /* the French duration question is much longer: keep it on one line */
-    html:lang(fr):not(.shot) .s1 h2.section.second { font-size: 28px; white-space: nowrap; }
+    /* "How much time do you need?" centred over its boxes; the longer French question may wrap */
+    html:not(.shot) .s1 h2.section.second { text-align: center; white-space: normal; text-wrap: balance; }
     html:not(.shot) .s1 .card .name { font-size: calc(26px * 1.18 / var(--dk, 1)); line-height: 1.15; letter-spacing: -.03em; }
     html:not(.shot) .s1 .card.intent { height: auto; min-height: 70px; padding: 10px 14px 12px 0; }
     html:not(.shot) .s1 .card.duration { padding: 9px 14px 11px 0; }
@@ -528,7 +528,7 @@
   /* ---------- Colours sampled from the mockups ---------- */
   .serif { color: #000215; }
   .page-title { color: #000; }
-  .card .desc { color: #5f6d94; font-weight: 400; }
+  .card .desc { color: #7884a6; font-weight: 400; }
   .step-label { color: #3f4a68; }
   .dot-radio { border-color: #056f8e; }
   .tick { border-color: #056f8e; }
@@ -1354,6 +1354,9 @@
         }
       }
       app.style.width = "";
+      // Step 1's Continue text renders at the size step 2's does. Step 2 fills the window height, so its
+      // scale tracks the height (about 18.5px x 0.0261 per px of height), capped by its maximum width scale.
+      if (s1) main.style.setProperty("--btnfs", Math.min(18.5 * 1.5 * w / DESIGN_W, .0261 * avail) / (lo * z) + "px");
     } else {
       const need = measure();
       if (need <= avail) { scroller.style.overflowY = ""; return; }
