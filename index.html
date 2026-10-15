@@ -298,12 +298,21 @@
     html:not(.shot) .s1 .cols { margin-top: 24px; }
     html:not(.shot) .s1 h2.section, html:not(.shot) .s1 h2.section.second { margin: 0 0 12px; }
     /* Step 1: the card is as wide as the other steps; content stays 864px wide and centred. */
-    html:not(.shot) main.s1 { padding-left: calc(114px / var(--dk, 1)); padding-right: calc(114px / var(--dk, 1)); }
+    html:not(.shot) main.s1 { padding-left: calc(28px / var(--dk, 1)); padding-right: calc(28px / var(--dk, 1)); }
+    /* wider duration column so each description fits on two lines */
+    html:not(.shot) .s1 .cols { grid-template-columns: max-content 1fr; column-gap: calc(30px / var(--dk, 1)); }
+    html:not(.shot) .s1 h2.section { white-space: nowrap; }
+    html:not(.shot) .s1 .card.intent { contain: inline-size; }   /* left column is as wide as its heading */
+    /* Continue: identical to step 2's button (step 2 draws it at scale 1.18) */
+    html:not(.shot) main.s1 .btn.s1 {
+      width: calc(260px * 1.18 / var(--dk, 1)); height: calc(46px * 1.18 / var(--dk, 1)); border-radius: calc(6px * 1.18 / var(--dk, 1));
+      font-size: calc(18.5px * 1.18 / var(--dk, 1)); font-weight: 400; background: #0a7192; margin-top: calc(18px * 1.18 / var(--dk, 1));
+    }
     html:not(.shot) .s1 h2.section, html:not(.shot) .s1 h2.section.second { font-size: calc(44.8px / var(--dk, 1)); line-height: 1.15; margin: 0 0 12px; }
     html:not(.shot) .s1 .cols { margin-top: 8px; }
     /* the French duration question is much longer: keep it on one line */
     html:lang(fr):not(.shot) .s1 h2.section.second { font-size: 28px; white-space: nowrap; }
-    html:not(.shot) .s1 .card .name { font-size: calc(28px / var(--dk, 1)); line-height: 1.15; }
+    html:not(.shot) .s1 .card .name { font-size: calc(26px * 1.18 / var(--dk, 1)); line-height: 1.15; letter-spacing: -.03em; }
     html:not(.shot) .s1 .card.intent { height: auto; min-height: 70px; padding: 10px 14px 12px 0; }
     html:not(.shot) .s1 .card.duration { padding: 9px 14px 11px 0; }
     html:not(.shot) .s1 .card .ic-cart, html:not(.shot) .s1 .card .ic-box { top: 50%; transform: translateY(-50%); }
