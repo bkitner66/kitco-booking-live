@@ -319,7 +319,7 @@
     html:not(.shot) .s1 .card .name { font-size: calc(28px * 1.18 / var(--dk, 1)); line-height: 1.15; letter-spacing: -.045em; }   /* = step 2 date heading */
     html:not(.shot) .s1 .card.intent { height: auto; min-height: 70px; padding: 10px 14px 12px 0; }
     html:not(.shot) .s1 .card.duration { padding: 9px 14px 11px 0; }
-    html:not(.shot) .s1 .card .ic-cart, html:not(.shot) .s1 .card .ic-box { top: 50%; transform: translateY(-50%); }
+    html:not(.shot) .s1 .card .ic-cart, html:not(.shot) .s1 .card .ic-box, html:not(.shot) .s1 .card .ic-recycle { top: 50%; transform: translateY(-50%); }
     /* descriptions match the size of step 3's placeholder text (13.1px at step 3's 1.5 scale) */
     html:not(.shot) .s1 .card .desc, html:not(.shot) .s1 .card.intent .desc { font-size: calc(19.6px / var(--dk, 1)); line-height: 1.3; max-width: none; margin-top: 3px; }
     html:not(.shot) .s2 .cols { margin-top: 24px; grid-template-columns: 1.3fr 1fr; }
@@ -399,6 +399,7 @@
   .card .icon svg { position: absolute; }
   .card .ic-cart { left: 20px; top: 19px; }
   .card .ic-box { left: 22px; top: 16.5px; }
+  .card .ic-recycle { left: 21px; top: 18px; }
   .card .name { display: flex; align-items: center; gap: 12px; font-size: 21px; line-height: 24px; letter-spacing: -.05em; }
   .card .desc { display: block; font-size: 13.2px; line-height: 16px; font-weight: 300; color: var(--muted); }
   .card.intent .desc { margin-top: 3px; max-width: 200px; }
@@ -643,7 +644,7 @@
       language: "Language", menu: "Menu",
       hello: "Hello,", logIn: "Log In", or: "or", createAccount: "Create Account", closeMenu: "Close menu",
       bookTitle: "Book an Appointment", step: n => `Step ${n} of 4`,
-      whatDo: "What would you like to do?", buy: "Buy", sell: "Sell",
+      whatDo: "What would you like to do?", buy: "Buy", sell: "Sell Bullion or Coins", scrap: "Sell Scrap",
       buyDesc: "Purchase gold, silver and other precious metals.", sellDesc: "Sell your gold, silver and other precious metals.",
       howLong: "How much time do you need?", duration: "Duration",
       d30: "If you know which bullion products you want to buy or sell, or to pick up an order placed online.",
@@ -662,7 +663,7 @@
       account: "Do you have a Kitco account?", yes: "Yes", no: "No",
       notesLbl: "Please provide more details to help us prepare for your visit",
       notesPh: "List all of the items you’d like to buy or sell and in which quantities, your payment or payout preferences, and your Kitco account number (if applicable).",
-      buyBullion: "Buy Bullion", sellBullion: "Sell Bullion", buySell: "Buy &amp; Sell", mtlTime: "Montréal time",
+      buyBullion: "Buy Bullion", sellBullion: "Sell Bullion", sellScrap: "Sell Scrap Metal", buySell: "Buy &amp; Sell", mtlTime: "Montréal time",
       address: "620 Cathcart St, Suite 900, Montréal",
       terms: 'I accept the SimplyBook.me <a href="https://simplybook.me/en/terms-and-conditions" target="_blank" rel="noopener">terms and conditions</a>',
       promos: "Send me promotions and helpful information.",
@@ -684,7 +685,7 @@
       language: "Langue", menu: "Menu",
       hello: "Bonjour,", logIn: "Ouvrir une session", or: "ou", createAccount: "Créer un compte", closeMenu: "Fermer le menu",
       bookTitle: "Prendre rendez-vous", step: n => `Étape ${n} de 4`,
-      whatDo: "Que souhaitez-vous faire?", buy: "Acheter", sell: "Vendre",
+      whatDo: "Que souhaitez-vous faire?", buy: "Acheter", sell: "Vendre lingots ou pièces", scrap: "Vendre des débris de métaux",
       buyDesc: "Achetez de l’or, de l’argent et d’autres métaux précieux.", sellDesc: "Vendez votre or, votre argent et vos autres métaux précieux.",
       howLong: "De combien de temps avez-vous besoin?", duration: "Durée",
       d30: "Si vous savez quels produits de lingots acheter ou vendre, ou pour récupérer une commande passée en ligne.",
@@ -703,7 +704,7 @@
       account: "Avez-vous un compte Kitco?", yes: "Oui", no: "Non",
       notesLbl: "Donnez-nous plus de détails pour nous aider à préparer votre visite",
       notesPh: "Indiquez les articles que vous souhaitez acheter ou vendre et leurs quantités, vos préférences de paiement ou de versement, ainsi que votre numéro de compte Kitco (le cas échéant).",
-      buyBullion: "Achat de lingots", sellBullion: "Vente de lingots", buySell: "Achat et vente", mtlTime: "heure de Montréal",
+      buyBullion: "Achat de lingots", sellBullion: "Vente de lingots", sellScrap: "Vente de débris de métaux", buySell: "Achat et vente", mtlTime: "heure de Montréal",
       address: "620, rue Cathcart, bureau 900, Montréal",
       terms: 'J’accepte les <a href="https://simplybook.me/fr/terms-and-conditions" target="_blank" rel="noopener">conditions générales</a> de SimplyBook.me',
       promos: "Envoyez-moi des promotions et des renseignements utiles.",
@@ -753,13 +754,14 @@
     return `<svg class="${cls}" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9ecef"/><stop offset="1" stop-color="#c3c8ce"/></linearGradient></defs><path fill="url(#${id})" fill-rule="evenodd" d="${d}"/></svg>`;
   };
 
+  const recycle = s => `<svg class="ic-recycle" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 17l-2 2l2 2"/><path d="M10 19h9a2 2 0 0 0 1.75 -2.75l-.55 -1"/><path d="M8.536 11l-.732 -2.732l-2.732 .732"/><path d="M7.804 8.268l-4.5 7.794a2 2 0 0 0 1.506 2.89l1.141 .024"/><path d="M15.464 11l2.732 .732l.732 -2.732"/><path d="M18.196 11.732l-4.5 -7.794a2 2 0 0 0 -3.256 -.14l-.591 .976"/></svg>`;
   const icon = {
     tick: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5L19.5 7"/></svg>`,
   };
 
 
   const blank = () => ({
-    step: 1, buy: false, sell: false, duration: null,
+    step: 1, buy: false, sell: false, scrap: false, duration: null,
     viewMonth: null, date: null, time: null,
     form: { name: "", email: "", cc: "+1", phone: "", value: "", account: null, notes: "", terms: false, promos: false },
     showErrors: false, sending: false, bookError: false,
@@ -792,7 +794,11 @@
     if (lang === "fr") return `${t.days[d.getDay()]} ${d.getDate() === 1 ? "1er" : d.getDate()} ${t.months[d.getMonth()]}${year ? " " + d.getFullYear() : ""}`;
     return `${t.days[d.getDay()]}, ${t.months[d.getMonth()]} ${d.getDate()}${year ? ", " + d.getFullYear() : ""}`;
   };
-  const intentLabel = () => state.buy && state.sell ? T().buySell : state.buy ? T().buyBullion : T().sellBullion;
+  const intentLabel = () => {
+    const t = T();
+    if (state.buy && state.sell && !state.scrap) return t.buySell;
+    return [state.buy && t.buyBullion, state.sell && t.sellBullion, state.scrap && t.sellScrap].filter(Boolean).join(" + ");
+  };
   // Success ring + check, traced; the check is revealed left to right so it looks drawn.
   const successIcon = () => {
     const [w, h, c, d] = TRACED.success, k = .85;
@@ -804,9 +810,11 @@
       <path class="ring" fill="${c}" fill-rule="evenodd" d="${ring.join(" ")}"/>
       <path class="check" fill="${c}" d="${check.join(" ")}" clip-path="url(#tick-wipe)"/></svg>`;
   };
-  const summaryIcon = () => state.buy && state.sell
-    ? `<span class="pair">${vec("cartT", "#000", .7)}${vec("box", "#000", .58)}</span>`
-    : state.buy ? vec("cartT", "#000", .9) : vec("box", "#000", .75);
+  const summaryIcon = () => {
+    const ics = [state.buy && vec("cartT", "#000", .7), state.sell && vec("box", "#000", .58), state.scrap && recycle(26)].filter(Boolean);
+    if (ics.length > 1) return `<span class="pair">${ics.join("")}</span>`;
+    return state.buy ? vec("cartT", "#000", .9) : state.sell ? vec("box", "#000", .75) : recycle(34);
+  };
   const digits = s => s.replace(/\D/g, "");
   const fmtPhone = (s, cc) => {
     const d = digits(s).slice(0, cc === "+1" ? 10 : 14);
@@ -869,7 +877,7 @@
   const demo = {
     async startTimes(from, to, serviceId) {
       await new Promise(r => setTimeout(r, shot ? 0 : 350));
-      const dur = { 1: 30, 2: 30, 4: 60, 5: 60, 7: 120, 8: 120 }[serviceId] || 30;
+      const dur = { 1: 30, 2: 30, 4: 60, 5: 60, 6: 60, 7: 120, 8: 120 }[serviceId] || 30;
       const out = {}, d = new Date(from + "T00:00:00"), end = new Date(to + "T00:00:00");
       const t = now(), nowMin = t.getHours() * 60 + t.getMinutes();
       for (; d <= end; d.setDate(d.getDate() + 1)) {
@@ -893,7 +901,11 @@
   const api = DEMO ? demo : live;
 
   const serviceId = () => {
-    const kind = state.buy && state.sell ? (CFG.buyAndSell || "buy") : state.buy ? "buy" : "sell";
+    // one choice: its own service; several: Buy wins (per config), otherwise scrap at 60 min, else bullion
+    const picked = ["buy", "sell", "scrap"].filter(k => state[k]);
+    const kind = picked.length === 1 ? picked[0]
+      : state.buy ? (CFG.buyAndSell || "buy")
+      : state.duration === 60 ? "scrap" : "sell";
     return ((CFG.services || {})[kind] || {})[state.duration];
   };
 
@@ -1076,6 +1088,7 @@
     const intents = [
       { id: "buy", name: t.buy, desc: t.buyDesc, ic: vec("cart", "#000", .8) },
       { id: "sell", name: t.sell, desc: t.sellDesc, ic: vec("box", "#000", .8) },
+      { id: "scrap", name: t.scrap, desc: "", ic: recycle(34) },
     ];
     const durations = [
       { m: 30, name: fmtDuration(30), desc: t.d30 },
@@ -1110,7 +1123,7 @@
         </div>
         </div></div>
         <div class="grow"></div>
-        <button class="btn s1" data-act="next" ${(state.buy || state.sell) && state.duration ? "" : "disabled"}>${t.cont}</button>
+        <button class="btn s1" data-act="next" ${(state.buy || state.sell || state.scrap) && state.duration ? "" : "disabled"}>${t.cont}</button>
       </main>`;
   }
 
@@ -1265,10 +1278,13 @@
     return e;
   }
 
+  // staff-facing note listing every choice, always in English
+  const intentLabelEn = () => [state.buy && "Buy Bullion", state.sell && "Sell Bullion or Coins", state.scrap && "Sell Scrap"].filter(Boolean).join(" + ");
   async function submitBooking() {
     const f = state.form;
     state.sending = true; state.bookError = false; render(false);
-    const notes = [state.buy && state.sell ? "Buy & Sell" : "", f.notes.trim()].filter(Boolean).join(" — ");
+    const picked = ["buy", "sell", "scrap"].filter(k => state[k]);
+    const notes = [picked.length > 1 ? intentLabelEn() : "", f.notes.trim()].filter(Boolean).join(" — ");
     try {
       const res = await api.book(serviceId(), iso(state.date), hms(state.time),
         { name: f.name.trim(), email: f.email.trim(), phone: digits(f.phone) ? `${f.cc} ${f.phone}` : "" },
@@ -1398,7 +1414,7 @@
     const v = el.dataset.v;
     switch (el.dataset.act) {
       case "menu": openMenu(); break;
-      case "intent": state[v] = !state[v]; render(false); break;
+      case "intent": state[v] = !state[v]; if (v === "scrap" && state.scrap) state.duration = 60; render(false); break;
       case "lang":
         if (v !== lang) { lang = v; try { localStorage.setItem("lang", v); } catch (e) {} render(false); }
         break;
