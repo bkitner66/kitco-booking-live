@@ -188,6 +188,13 @@
   .field.pair-row { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto; column-gap: 14px; }
   .field.pair-row > .field { margin-top: 0; min-width: 0; display: grid; grid-row: span 3; grid-template-rows: subgrid; }
   .pair-row .label { align-self: end; }
+  /* value on its own row; the account question sits on one line with Yes / No */
+  .field.pair-row { display: block; }
+  .field.pair-row > .field { display: block; }
+  .field.pair-row > .field + .field { display: flex; flex-wrap: wrap; align-items: center; column-gap: 18px; margin-top: 10px; }
+  .field.pair-row > .field + .field .label { margin: 0; padding: 0; align-self: center; line-height: 1.2; }
+  .field.pair-row > .field + .field .radios { height: auto; margin: 0; }
+  .field.pair-row > .field + .field .err { flex-basis: 100%; }
   .pair-row .radios { margin-top: 0; height: 33px; align-items: center; }
   .pair-row .radios label { width: auto; margin-right: 22px; }
 
@@ -670,7 +677,7 @@
       prepare: "Help us prepare for your visit",
       namePh: "Enter your name", nameLbl: "Name", emailPh: "Enter email address", emailLbl: "Email address",
       phone: "Phone number", ccLbl: "Country code",
-      value: "Est. transaction value (CAD)", valuePick: "Select a range", valueLbl: "Estimated transaction value in Canadian dollars",
+      value: "Estimated transaction value (CAD)", valuePick: "Select a range", valueLbl: "Estimated transaction value in Canadian dollars",
       account: "Do you have a Kitco account?", yes: "Yes", no: "No",
       notesLbl: "Please provide more details to help us prepare for your visit",
       notesPh: "List all of the items you’d like to buy or sell and in which quantities, your payment or payout preferences, and your Kitco account number (if applicable).",
