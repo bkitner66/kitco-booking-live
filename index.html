@@ -483,6 +483,17 @@
   .box .lead + input { padding-left: 0; }
   .box.short { height: 34px; }
   .box.shorter { height: 33px; }
+  .box.select { position: relative; }
+  .box select {
+    appearance: none; -webkit-appearance: none; border: 0; outline: 0; background: transparent; width: 100%; height: 100%;
+    padding: 0 30px 0 13px; font: inherit; font-size: 13.1px; color: var(--text); cursor: pointer;
+  }
+  .box select:invalid { color: #5f6d94; }
+  .box select option { color: var(--text); }
+  .box.select::after {
+    content: ""; position: absolute; right: 13px; top: 50%; width: 7px; height: 7px; margin-top: -5px; pointer-events: none;
+    border-right: 1.8px solid var(--teal); border-bottom: 1.8px solid var(--teal); transform: rotate(45deg);
+  }
   .box .plus { flex: none; padding-left: 13px; font-size: 13.5px; color: #0f1a3d; }
   .box .cc { height: 100%; width: 46px; flex: none; padding: 0 6px 0 1px; font-size: 13.5px; color: #0f1a3d; }
   .box .vsep { width: 1.2px; height: 21px; background: #b7bfd1; flex: none; }
@@ -659,7 +670,7 @@
       prepare: "Help us prepare for your visit",
       namePh: "Enter your name", nameLbl: "Name", emailPh: "Enter email address", emailLbl: "Email address",
       phone: "Phone number", ccLbl: "Country code",
-      value: "Est. transaction value (CAD)", valueLbl: "Estimated transaction value in Canadian dollars",
+      value: "Est. transaction value (CAD)", valuePick: "Select a range", valueLbl: "Estimated transaction value in Canadian dollars",
       account: "Do you have a Kitco account?", yes: "Yes", no: "No",
       notesLbl: "Please provide more details to help us prepare for your visit",
       notesPh: "List all of the items you’d like to buy or sell and in which quantities, your payment or payout preferences, and your Kitco account number (if applicable).",
@@ -671,7 +682,7 @@
       confirm: "Confirm Booking",
       success: "Success!", thanks: ["You’re all set! We’ve emailed you a confirmation with everything you need to know for your appointment.", "If you need to change your plans, use the links in the email to reschedule or cancel.", "Thank you! Our team looks forward to welcoming you."],
       close: "Close",
-      eName: "Please enter your name.", ePhone: "Please enter your phone number.", ePhoneBad: "Please enter a complete phone number, including the country code.", eEmail: "Please enter a valid email address.", eValue: "Please enter an estimated value.",
+      eName: "Please enter your name.", ePhone: "Please enter your phone number.", ePhoneBad: "Please enter a complete phone number, including the country code.", eEmail: "Please enter a valid email address.", eValue: "Please choose an estimated value.",
       eAccount: "Please choose Yes or No.", eTerms: "Please accept the terms and conditions.",
     },
     fr: {
@@ -700,7 +711,7 @@
       prepare: "Aidez-nous à préparer votre visite",
       namePh: "Entrez votre nom", nameLbl: "Nom", emailPh: "Entrez votre adresse courriel", emailLbl: "Adresse courriel",
       phone: "Numéro de téléphone", ccLbl: "Indicatif de pays",
-      value: "Valeur estimée ($ CA)", valueLbl: "Valeur estimée de la transaction en dollars canadiens",
+      value: "Valeur estimée ($ CA)", valuePick: "Choisissez une fourchette", valueLbl: "Valeur estimée de la transaction en dollars canadiens",
       account: "Avez-vous un compte Kitco?", yes: "Oui", no: "Non",
       notesLbl: "Donnez-nous plus de détails pour nous aider à préparer votre visite",
       notesPh: "Indiquez les articles que vous souhaitez acheter ou vendre et leurs quantités, vos préférences de paiement ou de versement, ainsi que votre numéro de compte Kitco (le cas échéant).",
@@ -712,7 +723,7 @@
       confirm: "Confirmer le rendez-vous",
       success: "Confirmé!", thanks: ["C’est confirmé! Nous vous avons envoyé par courriel une confirmation avec tout ce qu’il faut savoir pour votre rendez-vous.", "Si vos plans changent, utilisez les liens dans le courriel pour reporter ou annuler votre rendez-vous.", "Merci! Notre équipe a hâte de vous accueillir."],
       close: "Fermer",
-      eName: "Veuillez entrer votre nom.", ePhone: "Veuillez entrer votre numéro de téléphone.", ePhoneBad: "Veuillez entrer un numéro de téléphone complet, avec l’indicatif de pays.", eEmail: "Veuillez entrer une adresse courriel valide.", eValue: "Veuillez entrer une valeur estimée.",
+      eName: "Veuillez entrer votre nom.", ePhone: "Veuillez entrer votre numéro de téléphone.", ePhoneBad: "Veuillez entrer un numéro de téléphone complet, avec l’indicatif de pays.", eEmail: "Veuillez entrer une adresse courriel valide.", eValue: "Veuillez choisir une valeur estimée.",
       eAccount: "Veuillez choisir Oui ou Non.", eTerms: "Veuillez accepter les conditions générales.",
     },
   };
@@ -822,6 +833,15 @@
     if (d.length < 7) return `(${d.slice(0, 3)}) ${d.slice(3)}`;
     return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
   };
+  // estimated-value choices (from Agent1's booking history); the last one also matches the "Over $100,000? Call" note
+  const VALUE_RANGES = [
+    { id: "1k-5k", lo: 1000, hi: 4999 }, { id: "5k-10k", lo: 5000, hi: 9999 }, { id: "10k-25k", lo: 10000, hi: 24999 },
+    { id: "25k-100k", lo: 25000, hi: 99999 }, { id: "100k+", lo: 100000 },
+  ];
+  const money = (n, fr) => fr ? n.toLocaleString("fr-CA").replace(/\s/g, " ") + " $" : "$" + n.toLocaleString("en-CA");
+  const rangeLabel = (r, l = lang) => r.hi
+    ? `${money(r.lo, l === "fr")} – ${money(r.hi, l === "fr")}`
+    : l === "fr" ? `${money(r.lo, true)} ou plus` : `${money(r.lo)} or more`;
   const fmtMoney = s => { const d = digits(s).slice(0, 12); return d ? Number(d).toLocaleString("en-CA") : ""; };
 
   /* ---------- SimplyBook connection ----------
@@ -1206,7 +1226,10 @@
           <div class="field pair-row">
           <div class="field ${bad("value")}">
             <label class="label" for="value">${t.value}</label>
-            <div class="box shorter"><input id="value" name="value" inputmode="numeric" aria-label="${t.valueLbl}" value="${esc(f.value)}"></div>
+            <div class="box shorter select"><select id="value" name="value" required aria-label="${t.valueLbl}">
+              <option value="" ${f.value ? "" : "selected"} disabled>${t.valuePick}</option>
+              ${VALUE_RANGES.map(r => `<option value="${r.id}" ${f.value === r.id ? "selected" : ""}>${rangeLabel(r)}</option>`).join("")}
+            </select></div>
             <div class="err">${err.value || ""}</div>
           </div>
           <div class="field ${bad("account")}">
@@ -1271,8 +1294,7 @@
     if (!ph) e.phone = t.ePhone;
     else if (!cc || (cc === "1" ? ph.length !== 10 : ph.length < 6)) e.phone = t.ePhoneBad;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) e.email = t.eEmail;
-    const v = Number(digits(f.value));
-    if (!v) e.value = t.eValue;
+    if (!f.value) e.value = t.eValue;
     if (!f.account) e.account = t.eAccount;
     if (!f.terms) e.terms = t.eTerms;
     return e;
@@ -1288,7 +1310,7 @@
     try {
       const res = await api.book(serviceId(), iso(state.date), hms(state.time),
         { name: f.name.trim(), email: f.email.trim(), phone: digits(f.phone) ? `${f.cc} ${f.phone}` : "" },
-        { value: digits(f.value), account: f.account || "", notes });
+        { value: (r => r ? rangeLabel(r, "en") : "")(VALUE_RANGES.find(r => r.id === f.value)), account: f.account || "", notes });
       if (!res || (Array.isArray(res.bookings) && !res.bookings.length)) throw new Error("No booking returned");
       state.sending = false; go(4);
     } catch (e) {
@@ -1473,13 +1495,12 @@
       ph.placeholder = f.cc === "+1" ? "(555) 123-4567" : "Phone number";
     }
     else if (t.name === "phone") { f.phone = fmtPhone(t.value, f.cc); t.value = f.phone; }
-    else if (t.name === "value") { f.value = fmtMoney(t.value); t.value = f.value; }
     else f[t.name] = t.value;
 
     if (state.showErrors) {
       const err = validate();
       app.querySelectorAll(".invalid").forEach(box => {
-        const inp = box.querySelector("input, textarea");
+        const inp = box.querySelector("input, textarea, select");
         const names = [...box.querySelectorAll("input, textarea")].map(i => i.name === "cc" ? "phone" : i.name);
         if (inp && !names.some(n => n in err)) box.classList.remove("invalid");
       });
